@@ -17,6 +17,7 @@ for both customers and administrators.
 - [Technology Stack](#technology-stack)
 - [Installation](#installation)
 - [API Documentation](#api-documentation)
+- [Scripts](#scripts)
 - [License](#license)
 
 ## Features
@@ -94,6 +95,23 @@ To set up the **efurniture** platform locally:
 ## API Documentation
 
 - **[API Documentation](http://127.0.0.1:8000/docs)**
+
+## Scripts
+
+- **Install the required packages**:
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+- **Run the FastAPI server**:
+  ```bash
+  uvicorn app.main:app --reload
+  ```
+  
+- **Generate database migration**:
+  ```bash
+  alembic revision --autogenerate -m "migration message"
+  ```
 
 ## License
 

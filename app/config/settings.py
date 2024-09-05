@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     APP_NAME:  str = os.environ.get("APP_NAME", "FastAPI")
     DEBUG: bool = bool(os.environ.get("DEBUG", False))
 
-    # MySql Database Config
+    # Postgresql Database Config
     PG_HOST: str = os.environ.get("PG_HOST")
     PG_USER: str = os.environ.get("PG_USER")
     PG_PASSWORD: str = os.environ.get("PG_PASSWORD")
