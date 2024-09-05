@@ -8,7 +8,6 @@ blinker==1.8.2
 certifi==2024.7.4
 click==8.1.7
 dnspython==2.6.1
-email_validator==2.2.0
 fastapi==0.112.0
 fastapi-cli==0.0.5
 fastapi-mail==1.4.1
@@ -26,7 +25,6 @@ mdurl==0.1.2
 passlib==1.7.4
 pydantic==2.8.2
 pydantic-settings==2.4.0
-pydantic_core==2.20.1
 Pygments==2.18.0
 PyJWT==2.9.0
 python-dotenv==1.0.1
@@ -38,8 +36,12 @@ sniffio==1.3.1
 SQLAlchemy==2.0.32
 starlette==0.37.2
 typer==0.12.3
-typing_extensions==4.12.2
 uvicorn==0.30.5
-uvloop==0.19.0
 watchfiles==0.22.0
 websockets==12.0
+
+# Conditional dependency for windows
+typing_extensions==4.12.2; platform_system != 'Windows'
+pydantic_core==2.20.1; platform_system != 'Windows'
+email_validator==2.2.0; platform_system != 'Windows'
+uvloop==0.19.0; platform_system != 'Windows'
