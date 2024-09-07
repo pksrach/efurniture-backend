@@ -3,7 +3,7 @@ from app.config.database import Base
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-class Category(Base):
+class Brand(Base):
     __tablename__ = 'brands'
 
     brand_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
