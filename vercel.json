@@ -4,13 +4,7 @@
     {
       "src": "app/*.py",
       "use": "@vercel/python",
-      "env": {
-        "PG_HOST": "localhost",
-        "PG_USER": "postgres",
-        "PG_PASSWORD": "postgres",
-        "PG_DB": "efurniture"
-      },
-      "commands": [
+      "buildCommand": [
         "sh create_env.sh"
       ]
     }
