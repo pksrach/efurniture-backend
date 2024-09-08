@@ -1,9 +1,24 @@
 {
   "version": 2,
   "builds": [
-    { "src": "app/*.py", "use": "@vercel/python" }
+    {
+      "src": "app/*.py",
+      "use": "@vercel/python",
+      "env": {
+        "PG_HOST": "localhost",
+        "PG_USER": "postgres",
+        "PG_PASSWORD": "postgres",
+        "PG_DB": "efurniture"
+      },
+      "commands": [
+        "sh create_env.sh"
+      ]
+    }
   ],
   "routes": [
-    { "src": "/(.*)", "dest": "app/main.py" }
+    {
+      "src": "/(.*)",
+      "dest": "app/main.py"
+    }
   ]
 }
