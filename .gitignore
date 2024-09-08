@@ -125,3 +125,4 @@ dmypy.json
 # FastAPI specific
 /app/__pycache__/
 /app/*.db
+.vercel
