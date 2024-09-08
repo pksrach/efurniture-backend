@@ -5,7 +5,7 @@ import uuid
 from sqlalchemy.orm import relationship
 
 class Staff(Base):
-    __tablename__ = "staff"
+    __tablename__ = "staffs"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     gender = Column(Integer)
@@ -14,5 +14,5 @@ class Staff(Base):
     salary = Column(Float)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"))
 
-    user = relationship("User", back_populates="staff")
-    orders = relationship("Order", back_populates="staff")
+    user = relationship("User", back_populates="staffs")
+    orders = relationship("Order", back_populates="staffs")

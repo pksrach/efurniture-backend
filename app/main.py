@@ -27,4 +27,4 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "Hi, Your setup is done & working."}
+    return {"message": "ok"}

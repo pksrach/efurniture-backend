@@ -18,10 +18,10 @@ class Order(Base):
     payment_attachment = Column(String)
     order_status = Column(String)
     note = Column(String)
-    staff_id = Column(UUID(as_uuid=True), ForeignKey("staff.id"))
+    staff_id = Column(UUID(as_uuid=True), ForeignKey("staffs.id"))
 
     customer = relationship("Customer", back_populates="orders")
     location = relationship("Location")
     payment_method = relationship("PaymentMethod", back_populates="orders")
-    staff = relationship("Staff", back_populates="orders")
+    staffs = relationship("Staff", back_populates="orders")
     order_details = relationship("OrderDetail", back_populates="order")

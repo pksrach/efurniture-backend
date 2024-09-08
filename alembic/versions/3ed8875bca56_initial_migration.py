@@ -106,7 +106,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['category_id'], ['categories.category_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('staff',
+    op.create_table('staffs',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('gender', sa.Integer(), nullable=True),
@@ -146,7 +146,7 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['customer_id'], ['customers.id'], ),
     sa.ForeignKeyConstraint(['location_id'], ['locations.id'], ),
     sa.ForeignKeyConstraint(['payment_method_id'], ['payment_methods.id'], ),
-    sa.ForeignKeyConstraint(['staff_id'], ['staff.id'], ),
+    sa.ForeignKeyConstraint(['staff_id'], ['staffs.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('product_prices',
@@ -193,7 +193,7 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_user_tokens_refresh_key'), table_name='user_tokens')
     op.drop_index(op.f('ix_user_tokens_access_key'), table_name='user_tokens')
     op.drop_table('user_tokens')
-    op.drop_table('staff')
+    op.drop_table('staffs')
     op.drop_table('products')
     op.drop_table('notifications')
     op.drop_table('customers')
