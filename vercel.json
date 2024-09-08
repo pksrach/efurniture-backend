@@ -2,11 +2,9 @@
   "version": 2,
   "builds": [
     {
-      "src": "app/*.py",
+      "src": "app/main.py",
       "use": "@vercel/python",
-      "buildCommand": [
-        "sh create_env.sh"
-      ]
+      "config": { "runtime": "python3.9" }
     }
   ],
   "routes": [
