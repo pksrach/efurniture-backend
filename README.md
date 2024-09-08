@@ -7,16 +7,17 @@ for both customers and administrators.
 ## Contributing
 
 - **[Phankong Samrach](https://github.com/pksrach)**
-- **[Suon Pisey](https://github.com/SuonPisey)**
+- **[Meas Manet](https://github.com/meas-manet)**
 
 ## Table of Contents
 
+- [Contributing](#contributing)
 - [Features](#features)
 - [Core Functions](#core-functions)
 - [Technology Stack](#technology-stack)
 - [Installation](#installation)
 - [API Documentation](#api-documentation)
-- [Contributing](#contributing)
+- [Scripts](#scripts)
 - [License](#license)
 
 ## Features
@@ -94,6 +95,23 @@ To set up the **efurniture** platform locally:
 ## API Documentation
 
 - **[API Documentation](http://127.0.0.1:8000/docs)**
+
+## Scripts
+
+- **Install the required packages**:
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+- **Run the FastAPI server**:
+  ```bash
+  uvicorn app.main:app --reload
+  ```
+  
+- **Generate database migration**:
+  ```bash
+  alembic revision --autogenerate -m "migration message"
+  ```
 
 ## License
 
