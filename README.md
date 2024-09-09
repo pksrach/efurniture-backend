@@ -17,7 +17,7 @@ for both customers and administrators.
 - [Technology Stack](#technology-stack)
 - [Installation](#installation)
 - [API Documentation](#api-documentation)
-- [Scripts](#scripts)
+- [Scripts Used](#scripts-used)
 - [License](#license)
 
 ## Features
@@ -96,26 +96,60 @@ To set up the **efurniture** platform locally:
 
 - **[API Documentation](http://127.0.0.1:8000/docs)**
 
-## Scripts
+## Scripts Used
+
+- **Create a virtual environment**:
+  ```bash
+  python -m venv venv
+  ```
+
+- **Activate the virtual environment**:
+  ```bash
+    source venv/Scripts/activate
+    or
+    source venv/bin/activate
+    ```
+
+- **Create a `.env` file**:
+    ```bash
+    touch .env
+    ```
+
+- **Add the following environment variables to the `.env` file**:
+- **PG_HOST**=localhost
+- **PG_PORT**=5432
+- **PG_USER**=postgres
+- **PG_PASSWORD**=postgres
+- **PG_DB**=efurniture
+- **SECRET_KEY**=your_secret_key
+
 
 - **Install the required packages**:
   ```bash
   pip install -r requirements.txt
+  ```
+  
+- **Initialize the database**:
+  ```bash
+  alembic init alembic
+  ```
+
+- **Generate database migration**:
+  ```bash
+  alembic revision --autogenerate -m "Initial migration"
+  ```
+  
+- **Run the database migrations**:
+  ```bash
+  alembic upgrade head
   ```
 
 - **Run the FastAPI server**:
   ```bash
   uvicorn app.main:app --reload
   ```
-  
-- **Generate database migration**:
-  ```bash
-  alembic revision --autogenerate -m "migration message"
-  ```
 
 ## License
 
 **[SS5 Group - SETEC Institute](https://www.setecu.com/)**
-
-
 
