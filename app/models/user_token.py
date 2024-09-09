@@ -3,6 +3,8 @@ from app.config.database import Base
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 from sqlalchemy.orm import relationship, mapped_column
+from app.models import user
+
 
 class UserToken(Base):
     __tablename__ = "user_tokens"

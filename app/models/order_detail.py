@@ -1,12 +1,13 @@
-from sqlalchemy import Column,ForeignKey, Integer, String,Float
-from app.config.database import Base
+from sqlalchemy import Column, ForeignKey, Integer, Float
 from sqlalchemy.dialects.postgresql import UUID
-import uuid
 from sqlalchemy.orm import relationship
 
-class OrderDetail(Base):
+from app.models.base import BaseModel
+
+
+class OrderDetail(BaseModel):
     __tablename__ = "order_details"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
     order_id = Column(UUID(as_uuid=True), ForeignKey("orders.id"))
     product_price_id = Column(UUID(as_uuid=True), ForeignKey("product_prices.id"))
     price = Column(Float)
