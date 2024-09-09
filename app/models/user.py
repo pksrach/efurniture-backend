@@ -1,23 +1,18 @@
-from sqlalchemy import Boolean, Column, DateTime, String, func
-from app.config.database import Base
-from sqlalchemy.dialects.postgresql import UUID
-import uuid
+from sqlalchemy import Boolean, Column, DateTime, String, Integer
 from sqlalchemy.orm import relationship
-from datetime import datetime
 
-class User(Base):
+from app.models.base import BaseModel
+
+
+class User(BaseModel):
     __tablename__ = 'users'
-
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)  
-    name = Column(String(150))
+    username = Column(String(150), nullable=False)
+    password = Column(String(100), nullable=False)
     email = Column(String(255), unique=True, index=True)
-    mobile = Column(String(20), index=True)
-    password = Column(String(100))
+    role = Column(Integer, default=0)
     is_active = Column(Boolean, default=False)
-    verified_at = Column(DateTime, nullable=True, default=None)
-    updated_at = Column(DateTime, nullable=True, default=None, onupdate=datetime.now)
-    created_at = Column(DateTime, nullable=False, server_default=func.now())
 
+    verified_at = Column(DateTime, nullable=True, default=None)
     tokens = relationship("UserToken", back_populates="user")
 
     def get_context_string(self, context: str) -> str:
