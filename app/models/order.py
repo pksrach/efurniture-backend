@@ -1,13 +1,14 @@
 from sqlalchemy import Column, Date, ForeignKey, String, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-
 from app.models.base import BaseModel
+from app.models.location import Location  # Ensure Location is imported
+from app.models.payment_method import PaymentMethod  # Ensure PaymentMethod is imported
+from app.models.order_detail import OrderDetail  # Ensure OrderDetail is imported
 
 
 class Order(BaseModel):
     __tablename__ = "orders"
-
     order_date = Column(Date, nullable=False)
     customer_id = Column(UUID(as_uuid=True), ForeignKey("customers.id"))
     location_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"))

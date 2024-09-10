@@ -3,6 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.models.base import BaseModel
+from app.models.product_price import ProductPrice # Ensure ProductPrice is imported
 
 
 class OrderDetail(BaseModel):

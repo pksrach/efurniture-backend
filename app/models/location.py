@@ -12,8 +12,7 @@ class Location(BaseModel):
     price = Column(Float)
     parent_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"))
 
-    children = relationship("Location", back_populates="parent", remote_side=[id])
-    parent = relationship("Location", back_populates="children", remote_side=[parent_id])
-
+    # Define the children relationship (one-to-many)
+    children = relationship("Location", backref="parent", remote_side="Location.id")
 
     orders = relationship("Order", back_populates="location")

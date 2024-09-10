@@ -10,4 +10,5 @@ class PaymentMethod(BaseModel):
     name = Column(String, nullable=False)
     attachment_qr = Column(String)
 
+    # Relationship back to orders
     orders = relationship("Order", back_populates="payment_method")

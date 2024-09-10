@@ -49,8 +49,7 @@ async def create_user_account(data: RegisterUserRequest, session: AsyncSession):
             new_customer = Customer(
                 user_id=new_user.id,
                 name=data.username.capitalize(),
-                address=None,
-                phone=None,
+                gender=2,  # Default other
             )
 
             session.add(new_customer)
