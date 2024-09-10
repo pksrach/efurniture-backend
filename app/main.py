@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import user
+from app.routes.seeding import seed_user
+
 
 def create_application():
     application = FastAPI()
+    application.include_router(seed_user.seed_user_router)
     application.include_router(user.user_router)
     application.include_router(user.guest_router)
     application.include_router(user.auth_router)
