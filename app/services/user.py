@@ -23,7 +23,7 @@ settings = get_settings()
 async def create_user_account(data: RegisterUserRequest, session: AsyncSession):
     try:
         async with session.begin():
-            stmt = select(User).filter(User.email == data.email)
+            stmt = select(User).filter(User.email == data.email or User.username == data.username)
             result = await session.execute(stmt)
             user_exist = result.scalars().first()
 

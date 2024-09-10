@@ -1,10 +1,10 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class RegisterUserRequest(BaseModel):
-    username: str
-    password: str
-    email: EmailStr
+    username: str = Field(default="user")
+    password: str = Field(default="User@123")
+    email: EmailStr = Field(default="user@example.com")
 
 
 class EmailRequest(BaseModel):
