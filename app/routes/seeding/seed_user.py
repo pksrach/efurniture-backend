@@ -8,7 +8,7 @@ from app.services.seeding.seed_user import SeedUser
 
 seed_user_router = APIRouter(
     prefix="/seed/users",
-    tags=["Seed"],
+    tags=["Default"],
     responses={404: {"description": "Not Found!"}},
 )
 

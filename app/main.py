@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import user
 from app.routes.seeding import seed_user
+from app.config.swagger import custom_openapi
 
 
 def create_application():
@@ -10,6 +11,7 @@ def create_application():
     application.include_router(user.user_router)
     application.include_router(user.guest_router)
     application.include_router(user.auth_router)
+    application.openapi = lambda: custom_openapi(application)
     return application
 
 origins = [
@@ -28,6 +30,6 @@ app.add_middleware(
 )
 
 
-@app.get("/")
+@app.get("/", include_in_schema=False)
 async def root():
     return {"message": "ok"}

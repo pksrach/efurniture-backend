@@ -12,20 +12,20 @@ from app.services import user
 
 user_router = APIRouter(
     prefix="/users",
-    tags=["Users"],
+    tags=["Frontend API"],
     responses={404: {"description": "Not Found!"}},
 )
 
 auth_router = APIRouter(
     prefix="/users",
-    tags=["Users"],
+    tags=["Frontend API"],
     responses={404: {"description": "Not found"}},
     dependencies=[Depends(oauth2_scheme), Depends(get_current_user)]
 )
 
 guest_router = APIRouter(
     prefix="/auth",
-    tags=["Auth"],
+    tags=["Auth API"],
     responses={404: {"description": "Not found"}},
 )
 
