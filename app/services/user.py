@@ -79,7 +79,7 @@ async def get_login_token(data: OAuth2PasswordRequestForm, session: AsyncSession
 
 
 async def get_refresh_token(refresh_token: str, session: AsyncSession):
-    token_payload = await get_token_payload(refresh_token, settings.SECRET_KEY, settings.JWT_ALGORITHM)
+    token_payload = await get_token_payload(refresh_token, settings.JWT_SECRET, settings.JWT_ALGORITHM)
     if not token_payload:
         raise HTTPException(status_code=400, detail="Invalid Request.")
 
@@ -130,7 +130,7 @@ async def _generate_tokens(user, session):
     access_token = generate_token(at_payload, settings.JWT_SECRET, settings.JWT_ALGORITHM, at_expires)
 
     rt_payload = {"sub": str_encode(str(user.id)), "t": refresh_key, 'a': access_key}
-    refresh_token = generate_token(rt_payload, settings.SECRET_KEY, settings.JWT_ALGORITHM, rt_expires)
+    refresh_token = generate_token(rt_payload, settings.JWT_SECRET, settings.JWT_ALGORITHM, rt_expires)
     return {
         "access_token": access_token,
         "refresh_token": refresh_token,

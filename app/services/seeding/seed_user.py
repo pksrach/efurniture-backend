@@ -4,6 +4,7 @@ from datetime import datetime
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import or_
 
 from app.config.security import hash_password
 from app.constants.roles import Roles
@@ -15,7 +16,7 @@ class SeedUser:
         self.session = session
 
     async def user_exists(self, email: str, username: str) -> bool:
-        stmt = select(User).filter(User.email == email or User.username == username)
+        stmt = select(User).filter(or_(User.email == email, User.username == username))
         result = await self.session.execute(stmt)
         return result.scalars().first() is not None
 

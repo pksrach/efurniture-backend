@@ -3,9 +3,10 @@ from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
 from app.models.staff import Staff  # Ensure Staff is imported
 
+
 class User(BaseModel):
     __tablename__ = 'users'
-    username = Column(String(150), nullable=False)
+    username = Column(String(150), unique=True, nullable=False)
     password = Column(String(100), nullable=False)
     email = Column(String(255), unique=True, index=True)
     role = Column(Integer, default=0)
