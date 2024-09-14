@@ -6,14 +6,20 @@ from app.config.security import get_current_user
 from app.constants.roles import Roles
 from app.responses.auth import TokenResponse
 from app.responses.user import UserResponse, UserDataResponse
-from app.schemas.auth import LoginRequest, VerifyPasswordRequest, ResetNewPasswordRequest
-from app.services import auth
+from app.schemas.auth import LoginRequest, VerifyPasswordRequest
+from app.schemas.user import RegisterUserRequest
+from app.services import auth, user
 
 guest_router = APIRouter(
     prefix="/auth",
     tags=["Auth API"],
     responses={404: {"description": "Not found"}},
 )
+
+
+@guest_router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+async def register_user(data: RegisterUserRequest, session: AsyncSession = Depends(get_session)):
+    return await user.create_user_account(data, session)
 
 
 @guest_router.post("/login", status_code=status.HTTP_200_OK, response_model=TokenResponse)

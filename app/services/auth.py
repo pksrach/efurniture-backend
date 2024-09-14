@@ -91,7 +91,7 @@ async def send_reset_password_email(email: str, reset_token: str):
         "category": "Integration Test"
     }
     headers = {
-        "Authorization": "Bearer 9a0112a3a57900a65051b93b0d339ea8",
+        "Authorization": "Bearer " + settings.MAILTRAP_TEST_TOKEN,
         "Content-Type": "application/json"
     }
 
