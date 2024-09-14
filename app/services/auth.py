@@ -89,7 +89,7 @@ async def send_reset_password_email(email: str, reset_token: str):
         "to": [{"email": email}],
         "subject": "Password Reset Request",
         "text": f"Please use the following token to reset your password: {reset_token}",
-        "category.py": "Integration Test"
+        "backend_category.py": "Integration Test"
     }
     headers = {
         "Authorization": "Bearer " + settings.MAILTRAP_TEST_TOKEN,

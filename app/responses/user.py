@@ -2,12 +2,12 @@ from datetime import datetime
 from typing import Optional, Union
 from uuid import UUID
 
-from pydantic import EmailStr
+from pydantic import EmailStr, BaseModel
 
 from app.responses.base import BaseResponse
 
 
-class UserDataResponse(BaseResponse):
+class UserDataResponse(BaseModel):
     id: UUID | str
     username: str
     email: EmailStr
@@ -17,4 +17,8 @@ class UserDataResponse(BaseResponse):
 
 
 class UserResponse(BaseResponse):
-    data: UserDataResponse
+    data: UserDataResponse | None
+
+
+class UserListResponse(BaseResponse):
+    data: list[UserDataResponse] | None

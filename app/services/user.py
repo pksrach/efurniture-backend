@@ -15,7 +15,7 @@ from app.constants.roles import Roles
 from app.models.customer import Customer
 from app.models.user import User
 from app.models.user_token import UserToken
-from app.responses.user import UserDataResponse, UserResponse
+from app.responses.user import UserDataResponse, UserResponse, UserListResponse
 from app.schemas.user import RegisterUserRequest, ResetRequest
 from app.utils.email_context import FORGOT_PASSWORD
 from app.utils.string import unique_string
@@ -181,3 +181,24 @@ async def fetch_user_detail(pk: int, session: AsyncSession):
     if user:
         return user
     raise HTTPException(status_code=400, detail="User does not exist.")
+
+
+async def get_all_users(session: AsyncSession) -> UserListResponse:
+    stmt = select(User)
+    result = await session.execute(stmt)
+    users = result.scalars().all()
+    if users:
+        return UserListResponse(
+            message="Users fetched successfully.",
+            data=[
+                UserDataResponse(
+                    id=user.id,
+                    username=user.username,
+                    email=user.email,
+                    is_active=user.is_active,
+                    role=Roles.get_name(user.role),
+                    created_at=user.created_at
+                ) for user in users]
+        )
+
+    raise HTTPException(status_code=400, detail="No users found.")
