@@ -1,5 +1,6 @@
 import random
 from datetime import timedelta, datetime
+from uuid import UUID
 
 import httpx
 from fastapi import HTTPException
@@ -88,7 +89,7 @@ async def send_reset_password_email(email: str, reset_token: str):
         "to": [{"email": email}],
         "subject": "Password Reset Request",
         "text": f"Please use the following token to reset your password: {reset_token}",
-        "category": "Integration Test"
+        "category.py": "Integration Test"
     }
     headers = {
         "Authorization": "Bearer " + settings.MAILTRAP_TEST_TOKEN,
@@ -173,7 +174,7 @@ async def auth_verify_password(req: VerifyPasswordRequest, session: AsyncSession
     }
 
 
-async def auth_reset_new_password(user_id: int, new_password: str, session: AsyncSession):
+async def auth_reset_new_password(user_id: UUID, new_password: str, session: AsyncSession):
     if not user_id:
         raise HTTPException(status_code=400, detail="User not found.")
 

@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import user
+from app.routes.backend.base_backend import backend_router
 from app.routes.seeding import seed_user
 from app.routes import auth
 from app.config.swagger import custom_openapi
@@ -11,6 +12,7 @@ def create_application():
     application.include_router(seed_user.seed_user_router)
     application.include_router(user.user_router)
     application.include_router(auth.guest_router)
+    application.include_router(backend_router)
     application.openapi = lambda: custom_openapi(application)
     return application
 
