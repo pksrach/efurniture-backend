@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 
 from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
@@ -10,9 +11,11 @@ from sqlalchemy.orm import joinedload
 from app.config.security import generate_token, get_token_payload, hash_password, is_password_strong_enough, load_user, \
     str_decode, str_encode, verify_password
 from app.config.settings import get_settings
+from app.constants.roles import Roles
 from app.models.customer import Customer
 from app.models.user import User
 from app.models.user_token import UserToken
+from app.responses.user import UserDataResponse, UserResponse
 from app.schemas.user import RegisterUserRequest, ResetRequest
 from app.utils.email_context import FORGOT_PASSWORD
 from app.utils.string import unique_string
@@ -20,10 +23,10 @@ from app.utils.string import unique_string
 settings = get_settings()
 
 
-async def create_user_account(data: RegisterUserRequest, session: AsyncSession):
+async def create_user_account(data: RegisterUserRequest, session: AsyncSession) -> UserResponse:
     try:
         async with session.begin():
-            stmt = select(User).filter(User.email == data.email or User.username == data.username)
+            stmt = select(User).where(or_(User.email == data.email, User.username == data.username))
             result = await session.execute(stmt)
             user_exist = result.scalars().first()
 
@@ -57,7 +60,17 @@ async def create_user_account(data: RegisterUserRequest, session: AsyncSession):
 
         await session.commit()
         await session.refresh(new_user)
-        return new_user
+        return UserResponse(
+            data=UserDataResponse(
+                id=new_user.id,
+                username=new_user.username,
+                email=new_user.email,
+                is_active=new_user.is_active,
+                role=Roles.get_name(new_user.role),
+                created_at=new_user.created_at
+            ),
+            message="User account created successfully."
+        )
 
     except Exception as e:
         logging.exception(e)
