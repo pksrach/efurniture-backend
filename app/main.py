@@ -11,7 +11,6 @@ def create_application():
     application.include_router(seed_user.seed_user_router)
     application.include_router(user.user_router)
     application.include_router(auth.guest_router)
-    application.include_router(user.auth_router)
     application.openapi = lambda: custom_openapi(application)
     return application
 
