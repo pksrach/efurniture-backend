@@ -4,15 +4,16 @@ import uuid
 from datetime import datetime, timedelta
 
 import jwt
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext
-from sqlalchemy import text, or_
+from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.config.database import get_session
 from app.config.settings import get_settings
+from app.constants.roles import Roles
 from app.models.user import User
 
 settings = get_settings()
@@ -132,3 +133,21 @@ async def get_current_user(token: str = Depends(token_scheme), db: AsyncSession 
         return user
 
     raise HTTPException(status_code=401, detail="Not authorized")
+
+
+async def get_backend_user(current_user: User = Depends(get_current_user)):
+    if current_user.role not in [Roles.ADMIN, Roles.USER, Roles.SUPER_ADMIN]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions to access this route"
+        )
+    return current_user
+
+
+async def get_frontend_user(current_user: User = Depends(get_current_user)):
+    if current_user.role not in [Roles.CUSTOMER]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions to access this route you are not a customer"
+        )
+    return current_user

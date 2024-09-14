@@ -1,25 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import user
-from app.routes.backend.base_backend import backend_router
-from app.routes.seeding import seed_user
-from app.routes import auth
+
 from app.config.swagger import custom_openapi
+from app.routes import auth
+from app.routes.backend.base_backend import backend_router
+from app.routes.frontend.base_frontend import frontend_router
+from app.routes.seeding import seed_user
 
 
 def create_application():
     application = FastAPI()
     application.include_router(seed_user.seed_user_router)
-    application.include_router(user.user_router)
+    application.include_router(frontend_router)
     application.include_router(auth.guest_router)
     application.include_router(backend_router)
     application.openapi = lambda: custom_openapi(application)
     return application
 
-origins = [
-    "http://localhost:3000", 
-]
 
+origins = [
+    "http://localhost:3000",
+]
 
 app = create_application()
 
