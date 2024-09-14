@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, Header, status
-from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.database import get_session
@@ -7,10 +6,8 @@ from app.config.security import get_current_user
 from app.constants.roles import Roles
 from app.responses.auth import TokenResponse
 from app.responses.user import UserResponse, UserDataResponse
-from app.schemas.auth import LoginRequest
-from app.schemas.user import ResetRequest
+from app.schemas.auth import LoginRequest, VerifyPasswordRequest, ResetNewPasswordRequest
 from app.services import auth
-from app.services import user
 
 guest_router = APIRouter(
     prefix="/auth",
@@ -44,7 +41,16 @@ async def me(user: UserDataResponse = Depends(get_current_user)):
     )
 
 
-@guest_router.put("/reset-password", status_code=status.HTTP_200_OK)
-async def reset_password(data: ResetRequest, session: AsyncSession = Depends(get_session)):
-    await user.reset_user_password(data, session)
-    return JSONResponse({"message": "Your password has been updated."})
+@guest_router.post("/forgot-password", status_code=status.HTTP_200_OK)
+async def forgot_password(email: str, session: AsyncSession = Depends(get_session)):
+    return await auth.auth_forgot_password(email, session)
+
+
+@guest_router.post("/verify-password", status_code=status.HTTP_200_OK)
+async def verify_password(req: VerifyPasswordRequest, session: AsyncSession = Depends(get_session)):
+    return await auth.auth_verify_password(req, session)
+
+
+@guest_router.post("/reset-new-password", status_code=status.HTTP_200_OK)
+async def reset_new_password(new_password: str, user: UserDataResponse = Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+    return await auth.auth_reset_new_password(user.id, new_password, session)

@@ -72,11 +72,12 @@ def get_token_payload(token: str, secret: str, algo: str):
     return None
 
 
-def generate_token(user_id: uuid.UUID, secret: str, algo: str, expiry: timedelta):
+def generate_token(user_id: uuid.UUID, secret: str, algo: str, expiry: timedelta, options: dict = None):
     expire = datetime.now() + expiry
     payload = {
         "sub": str(user_id),
         "exp": expire,
+        "dict": dict() if options is None else options
     }
     token = jwt.encode(payload, secret, algorithm=algo, headers={"typ": "JWT", "alg": algo})
     return token
