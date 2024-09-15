@@ -148,6 +148,6 @@ async def get_frontend_user(current_user: User = Depends(get_current_user)):
     if current_user.role not in [Roles.CUSTOMER]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to access this route you are not a customer"
+            detail="Not enough permissions to access this route, you are not a customer"
         )
     return current_user

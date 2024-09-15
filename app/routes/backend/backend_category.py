@@ -6,6 +6,7 @@ from app.services import category
 
 category_router = APIRouter(
     prefix="/categories",
+    tags=["Backend Category API"],
     responses={404: {"description": "Not found"}},
 )
 

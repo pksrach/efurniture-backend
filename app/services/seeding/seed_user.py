@@ -21,7 +21,7 @@ class SeedUser:
         return result.scalars().first() is not None
 
     async def seed_users(self):
-        if not await self.user_exists("admin@example.com"):
+        if not await self.user_exists("admin@example.com", "admin"):
             admin_user = User(
                 username="admin",
                 email="admin@example.com",
@@ -35,7 +35,7 @@ class SeedUser:
         else:
             return "Users already seeded."
 
-        if not await self.user_exists("superadmin@example.com"):
+        if not await self.user_exists("superadmin@example.com", "superadmin"):
             super_admin_user = User(
                 username="superadmin",
                 email="superadmin@example.com",

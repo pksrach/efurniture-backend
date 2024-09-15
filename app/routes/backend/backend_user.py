@@ -6,6 +6,8 @@ from app.services.user import get_all_users
 
 backend_user_router = APIRouter(
     prefix="/backend/users",
+    tags=["Backend User API"],
+    responses={404: {"description": "Not found"}},
 )
 
 

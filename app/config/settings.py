@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS", 30))
 
     # Email Config
-    MAILTRAP_TEST_TOKEN: str = os.environ.get("MAILTRAP_TEST_TOKEN")
+    MAILTRAP_TEST_TOKEN: str = os.environ.get("MAILTRAP_TEST_TOKEN", "fake_mailtrap_token")
 
 @lru_cache()
 def get_settings() -> Settings:

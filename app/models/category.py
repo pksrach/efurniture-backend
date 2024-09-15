@@ -5,7 +5,7 @@ from app.models.base import BaseModel
 
 
 class Category(BaseModel):
-    __tablename__ = 'categories'  # This is the correct table name
+    __tablename__ = 'categories'
 
     name = Column(String(100), nullable=False, unique=True)
     description = Column(Text, nullable=True)

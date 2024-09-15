@@ -3,7 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class CategoryRequest(BaseModel):
-    name: str = Field(default="Table")
+class BrandRequest(BaseModel):
+    name: str = Field(default="Honda")
     description: Optional[str] = None
     attachment: Optional[str] = None

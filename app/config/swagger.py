@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 
-from app.config.security import bearer_token
-
 
 def custom_openapi(app: FastAPI):
     if app.openapi_schema:
@@ -15,7 +13,11 @@ def custom_openapi(app: FastAPI):
     )
     openapi_schema["tags"] = [
         {"name": "Auth API", "description": "Operations for backend API"},
-        {"name": "Backend API", "description": "Operations for backend API"},
+
+        {"name": "Backend Category API", "description": "Operations for category management in the backend"},
+        {"name": "Backend Brand API", "description": "Operations for brand management in the backend"},
+        {"name": "Backend User API", "description": "Operations for user management in the backend"},
+
         {"name": "Frontend API", "description": "Operations for frontend API"},
         {"name": "Default", "description": "Default operations"},
     ]
