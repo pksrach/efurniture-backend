@@ -14,8 +14,10 @@ def custom_openapi(app: FastAPI):
     openapi_schema["tags"] = [
         {"name": "Auth API", "description": "Operations for backend API"},
 
+        {"name": "Backend Color API", "description": "Operations for color management in the backend"},
         {"name": "Backend Category API", "description": "Operations for category management in the backend"},
         {"name": "Backend Brand API", "description": "Operations for brand management in the backend"},
+        {"name": "Backend Product API", "description": "Operations for product management in the backend"},
         {"name": "Backend User API", "description": "Operations for user management in the backend"},
         {"name": "Backend Customer API", "description": "Operations for customer management in the backend"},
 
