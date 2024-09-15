@@ -3,6 +3,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
 
+
 class Customer(BaseModel):
     __tablename__ = "customers"
     name = Column(String, nullable=False)
