@@ -7,8 +7,8 @@ from app.responses.base import BaseResponse
 
 
 class KeyValueResponse(BaseModel):
-    key: str | UUID
-    value: str
+    key: str | UUID | None
+    value: str | None
 
 
 class ProductDataResponse(BaseModel):
@@ -16,8 +16,8 @@ class ProductDataResponse(BaseModel):
     name: str
     description: str | None
     attachment: str | None
-    category: KeyValueResponse | None
-    brand: KeyValueResponse | None
+    category: str | None
+    brand: str | None
     is_active: bool
 
     @classmethod
@@ -27,14 +27,8 @@ class ProductDataResponse(BaseModel):
             name=product.name,
             description=product.description,
             attachment=product.attachment,
-            category=KeyValueResponse(
-                key=product.category.id if product.category else None,
-                value=product.category.name if product.category else None,
-            ),
-            brand=KeyValueResponse(
-                key=product.brand.id if product.brand else None,
-                value=product.brand.name if product.brand else None,
-            ),
+            category=str(product.category_id),
+            brand=str(product.brand_id),
             is_active=product.is_active,
         )
 
@@ -59,5 +53,3 @@ class ProductListResponse(BaseResponse):
             data=[ProductDataResponse.from_entity(product) for product in products],
             message="Products fetched successfully"
         )
-
-

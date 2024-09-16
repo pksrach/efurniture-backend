@@ -4,7 +4,7 @@ from sqlalchemy.orm import joinedload
 
 from app.config.settings import get_settings
 from app.models.product import Product
-from app.responses.product import ProductListResponse, ProductDataResponse, KeyValueResponse, ProductResponse
+from app.responses.product import ProductListResponse, ProductDataResponse, ProductResponse
 from app.schemas.product import ProductRequest
 
 settings = get_settings()
@@ -14,7 +14,8 @@ async def get_products(session: AsyncSession) -> ProductListResponse:
     stmt = (
         select(Product)
         .options(
-            joinedload(Product.category), joinedload(Product.brand)
+            joinedload(Product.category),
+            joinedload(Product.brand)
         ).order_by(Product.created_at.desc())
     )
     result = await session.execute(stmt)
@@ -26,7 +27,8 @@ async def get_product(id: str, session: AsyncSession) -> ProductResponse:
     stmt = (
         select(Product)
         .options(
-            joinedload(Product.category), joinedload(Product.brand)
+            joinedload(Product.category),
+            joinedload(Product.brand)
         ).where(Product.id == id)
     )
     result = await session.execute(stmt)
@@ -49,21 +51,7 @@ async def create_product(req: ProductRequest, session: AsyncSession) -> ProductR
         product = result.scalar()
         if product:
             return ProductResponse(
-                data=ProductDataResponse(
-                    id=product.id,
-                    name=product.name,
-                    description=product.description,
-                    attachment=product.attachment,
-                    category=KeyValueResponse(
-                        key=product.category.id if product.category else None,
-                        value=product.category.name if product.category else None,
-                    ),
-                    brand=KeyValueResponse(
-                        key=product.brand.id if product.brand else None,
-                        value=product.brand.name if product.brand else None,
-                    ),
-                    is_active=product.is_active
-                ),
+                data=ProductDataResponse.from_entity(product),
                 message="Product already exists"
             )
 
@@ -77,12 +65,16 @@ async def create_product(req: ProductRequest, session: AsyncSession) -> ProductR
         session.add(product)
         await session.commit()
 
-        return ProductResponse.from_entity(product)
+        return ProductResponse(
+            data=ProductDataResponse.from_entity(product),
+            message="Product created successfully"
+        )
     except Exception as e:
         return ProductResponse(
             data=None,
             message=str(e)
         )
+
 
 #
 # async def update_color(id: str, req: ColorRequest, session: AsyncSession) -> ProductResponse:
@@ -110,26 +102,20 @@ async def create_product(req: ProductRequest, session: AsyncSession) -> ProductR
 #         message="Product updated successfully"
 #     )
 #
-#
-# async def delete_color(id: str, session: AsyncSession) -> ProductResponse:
-#     stmt = select(Product).where(Product.id == id)
-#     result = await session.execute(stmt)
-#     product = result.scalars().first()
-#
-#     if product is None:
-#         return ProductResponse(
-#             data=None,
-#             message="Product not found"
-#         )
-#
-#     await session.delete(product)
-#     await session.commit()
-#     return ProductResponse(
-#         data=ProductDataResponse(
-#             id=product.id,
-#             code=product.code,
-#             name=product.name,
-#             highlight=product.highlight,
-#         ),
-#         message="Product deleted successfully"
-#     )
+
+async def delete_product(id: str, session: AsyncSession):
+    stmt = select(Product).where(Product.id == id)
+    result = await session.execute(stmt)
+    product = result.scalar()
+
+    if product is None:
+        return ProductResponse(
+            data=None,
+            message="Product not found"
+        )
+
+    await session.delete(product)
+    await session.commit()
+    return {
+        "message": "Product deleted successfully"
+    }
