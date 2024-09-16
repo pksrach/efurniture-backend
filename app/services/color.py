@@ -13,21 +13,13 @@ async def get_colors(session: AsyncSession) -> ColorListResponse:
     stmt = select(Color).order_by(Color.created_at.desc())
     result = await session.execute(stmt)
     colors = result.scalars().all()
-    return ColorListResponse(
-        data=[ColorDataResponse(
-            id=color.id,
-            code=color.code,
-            name=color.name,
-            highlight=color.highlight,
-        ) for color in colors],
-        message="Brands fetched successfully"
-    )
+    return ColorListResponse.from_entities(colors)
 
 
 async def get_color(id: str, session: AsyncSession) -> ColorResponse:
     stmt = select(Color).where(Color.id == id)
     result = await session.execute(stmt)
-    color = result.scalars().first()
+    color = result.scalar()
 
     if color is None:
         return ColorResponse(
@@ -35,15 +27,7 @@ async def get_color(id: str, session: AsyncSession) -> ColorResponse:
             message="Color not found"
         )
 
-    return ColorResponse(
-        data=ColorDataResponse(
-            id=color.id,
-            code=color.code,
-            name=color.name,
-            highlight=color.highlight,
-        ),
-        message="Color fetched successfully"
-    )
+    return ColorResponse.from_entity(color)
 
 
 async def create_color(req: ColorRequest, session: AsyncSession) -> ColorResponse:
@@ -53,12 +37,7 @@ async def create_color(req: ColorRequest, session: AsyncSession) -> ColorRespons
     color = result.scalars().first()
     if color:
         return ColorResponse(
-            data=ColorDataResponse(
-                id=color.id,
-                code=color.code,
-                name=color.name,
-                highlight=color.highlight,
-            ),
+            data=ColorDataResponse.from_entity(color),
             message="Color already exists"
         )
 
@@ -70,12 +49,7 @@ async def create_color(req: ColorRequest, session: AsyncSession) -> ColorRespons
     session.add(color)
     await session.commit()
     return ColorResponse(
-        data=ColorDataResponse(
-            id=color.id,
-            code=color.code,
-            name=color.name,
-            highlight=color.highlight,
-        ),
+        data=ColorDataResponse.from_entity(color),
         message="Color created successfully"
     )
 
@@ -96,12 +70,7 @@ async def update_color(id: str, req: ColorRequest, session: AsyncSession) -> Col
     color.highlight = req.highlight
     await session.commit()
     return ColorResponse(
-        data=ColorDataResponse(
-            id=color.id,
-            code=color.code,
-            name=color.name,
-            highlight=color.highlight,
-        ),
+        data=ColorDataResponse.from_entity(color),
         message="Color updated successfully"
     )
 
@@ -120,11 +89,6 @@ async def delete_color(id: str, session: AsyncSession) -> ColorResponse:
     await session.delete(color)
     await session.commit()
     return ColorResponse(
-        data=ColorDataResponse(
-            id=color.id,
-            code=color.code,
-            name=color.name,
-            highlight=color.highlight,
-        ),
+        data=ColorDataResponse.from_entity(color),
         message="Color deleted successfully"
     )

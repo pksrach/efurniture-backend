@@ -24,5 +24,14 @@ def custom_openapi(app: FastAPI):
         {"name": "Frontend API", "description": "Operations for frontend API"},
         {"name": "Default", "description": "Default operations"},
     ]
+
+    openapi_schema["info"]["contact"] = {
+        "name": "SETEC Institute",
+        "url": "https://www.setecu.com",
+    }
+    openapi_schema["externalDocs"] = {
+        "description": "Find more info here",
+        "url": "https://fastapi.tiangolo.com",
+    }
     app.openapi_schema = openapi_schema
     return app.openapi_schema

@@ -14,9 +14,9 @@ backend_router = APIRouter(
     dependencies=[Depends(get_backend_user)]
 )
 
-backend_router.include_router(category_router)
-backend_router.include_router(backend_user_router)
-backend_router.include_router(brand_router)
-backend_router.include_router(customer_router)
-backend_router.include_router(color_router)
-backend_router.include_router(product_router)
+backend_router.include_router(category_router, tags=["Backend Category API"])
+backend_router.include_router(backend_user_router, tags=["Backend User API"])
+backend_router.include_router(brand_router, tags=["Backend Brand API"])
+backend_router.include_router(customer_router, tags=["Backend Customer API"])
+backend_router.include_router(color_router, tags=["Backend Color API"])
+backend_router.include_router(product_router, tags=["Backend Product API"])

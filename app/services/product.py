@@ -19,24 +19,7 @@ async def get_products(session: AsyncSession) -> ProductListResponse:
     )
     result = await session.execute(stmt)
     products = result.scalars().all()
-    return ProductListResponse(
-        data=[ProductDataResponse(
-            id=product.id,
-            name=product.name,
-            description=product.description,
-            attachment=product.attachment,
-            category=KeyValueResponse(
-                key=product.category.id if product.category else None,
-                value=product.category.name if product.category else None,
-            ),
-            brand=KeyValueResponse(
-                key=product.brand.id if product.brand else None,
-                value=product.brand.name if product.brand else None,
-            ),
-            is_active=product.is_active,
-        ) for product in products],
-        message="Brands fetched successfully"
-    )
+    return ProductListResponse.from_entities(list(products))
 
 
 async def get_product(id: str, session: AsyncSession) -> ProductResponse:
@@ -55,24 +38,7 @@ async def get_product(id: str, session: AsyncSession) -> ProductResponse:
             message="Product not found"
         )
 
-    return ProductResponse(
-        data=ProductDataResponse(
-            id=product.id,
-            name=product.name,
-            description=product.description,
-            attachment=product.attachment,
-            category=KeyValueResponse(
-                key=product.category.id if product.category else None,
-                value=product.category.name if product.category else None,
-            ),
-            brand=KeyValueResponse(
-                key=product.brand.id if product.brand else None,
-                value=product.brand.name if product.brand else None,
-            ),
-            is_active=product.is_active,
-        ),
-        message="Product fetched successfully"
-    )
+    return ProductResponse.from_entity(product)
 
 
 async def create_product(req: ProductRequest, session: AsyncSession) -> ProductResponse:
@@ -111,24 +77,7 @@ async def create_product(req: ProductRequest, session: AsyncSession) -> ProductR
         session.add(product)
         await session.commit()
 
-        return ProductResponse(
-            data=ProductDataResponse(
-                id=product.id,
-                name=product.name,
-                description=product.description,
-                attachment=product.attachment,
-                category=KeyValueResponse(
-                    key=product.category.id if product.category else None,
-                    value=product.category.name if product.category else None,
-                ),
-                brand=KeyValueResponse(
-                    key=product.brand.id if product.brand else None,
-                    value=product.brand.name if product.brand else None,
-                ),
-                is_active=product.is_active,
-            ),
-            message="Product create successfully"
-        )
+        return ProductResponse.from_entity(product)
     except Exception as e:
         return ProductResponse(
             data=None,

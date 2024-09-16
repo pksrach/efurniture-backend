@@ -13,15 +13,7 @@ async def get_categories(session: AsyncSession) -> CategoryListResponse:
     stmt = select(Category).order_by(Category.created_at.desc())
     result = await session.execute(stmt)
     categories = result.scalars().all()
-    return CategoryListResponse(
-        data=[CategoryDataResponse(
-            id=category.id,
-            name=category.name,
-            description=category.description,
-            attachment=category.attachment
-        ) for category in categories],
-        message="Categories fetched successfully"
-    )
+    return CategoryListResponse.from_entities(list(categories))
 
 
 async def get_category(id: str, session: AsyncSession) -> CategoryResponse:
@@ -35,30 +27,17 @@ async def get_category(id: str, session: AsyncSession) -> CategoryResponse:
             message="Category not found"
         )
 
-    return CategoryResponse(
-        data=CategoryDataResponse(
-            id=category.id,
-            name=category.name,
-            description=category.description,
-            attachment=category.attachment
-        ),
-        message="Category fetched successfully"
-    )
+    return CategoryResponse.from_entity(category)
 
 
 async def create_category(req: CategoryRequest, session: AsyncSession) -> CategoryResponse:
     # Check exists name or not
     stmt = select(Category).where(Category.name == req.name)
     result = await session.execute(stmt)
-    category = result.scalars().first()
+    category = result.scalar()
     if category:
         return CategoryResponse(
-            data=CategoryDataResponse(
-                id=category.id,
-                name=category.name,
-                description=category.description,
-                attachment=category.attachment
-            ),
+            data=CategoryDataResponse.from_entity(category),
             message="Category already exists"
         )
 
@@ -70,12 +49,7 @@ async def create_category(req: CategoryRequest, session: AsyncSession) -> Catego
     session.add(category)
     await session.commit()
     return CategoryResponse(
-        data=CategoryDataResponse(
-            id=category.id,
-            name=category.name,
-            description=category.description,
-            attachment=category.attachment
-        ),
+        data=CategoryDataResponse.from_entity(category),
         message="Category created successfully"
     )
 
@@ -96,12 +70,7 @@ async def update_category(id: str, req: CategoryRequest, session: AsyncSession) 
     category.attachment = req.attachment
     await session.commit()
     return CategoryResponse(
-        data=CategoryDataResponse(
-            id=category.id,
-            name=category.name,
-            description=category.description,
-            attachment=category.attachment
-        ),
+        data=CategoryDataResponse.from_entity(category),
         message="Category updated successfully"
     )
 
@@ -120,11 +89,6 @@ async def delete_category(id: str, session: AsyncSession) -> CategoryResponse:
     await session.delete(category)
     await session.commit()
     return CategoryResponse(
-        data=CategoryDataResponse(
-            id=category.id,
-            name=category.name,
-            description=category.description,
-            attachment=category.attachment
-        ),
+        data=CategoryDataResponse.from_entity(category),
         message="Category deleted successfully"
     )

@@ -13,15 +13,7 @@ async def get_brands(session: AsyncSession) -> BrandListResponse:
     stmt = select(Brand).order_by(Brand.created_at.desc())
     result = await session.execute(stmt)
     brands = result.scalars().all()
-    return BrandListResponse(
-        data=[BrandDataResponse(
-            id=brand.id,
-            name=brand.name,
-            description=brand.description,
-            attachment=brand.attachment
-        ) for brand in brands],
-        message="Brands fetched successfully"
-    )
+    return BrandListResponse.from_entities(list(brands))
 
 
 async def get_brand(id: str, session: AsyncSession) -> BrandResponse:
@@ -35,30 +27,17 @@ async def get_brand(id: str, session: AsyncSession) -> BrandResponse:
             message="Brand not found"
         )
 
-    return BrandResponse(
-        data=BrandDataResponse(
-            id=brand.id,
-            name=brand.name,
-            description=brand.description,
-            attachment=brand.attachment
-        ),
-        message="Brand fetched successfully"
-    )
+    return BrandResponse.from_entity(brand)
 
 
 async def create_brand(req: BrandRequest, session: AsyncSession) -> BrandResponse:
     # Check exists name or not
     stmt = select(Brand).where(Brand.name == req.name)
     result = await session.execute(stmt)
-    brand = result.scalars().first()
+    brand = result.scalar()
     if brand:
         return BrandResponse(
-            data=BrandDataResponse(
-                id=brand.id,
-                name=brand.name,
-                description=brand.description,
-                attachment=brand.attachment
-            ),
+            data=BrandDataResponse.from_entity(brand),
             message="Brand already exists"
         )
 
@@ -70,12 +49,7 @@ async def create_brand(req: BrandRequest, session: AsyncSession) -> BrandRespons
     session.add(brand)
     await session.commit()
     return BrandResponse(
-        data=BrandDataResponse(
-            id=brand.id,
-            name=brand.name,
-            description=brand.description,
-            attachment=brand.attachment
-        ),
+        data=BrandDataResponse.from_entity(brand),
         message="Brand created successfully"
     )
 
@@ -96,12 +70,7 @@ async def update_brand(id: str, req: BrandRequest, session: AsyncSession) -> Bra
     brand.attachment = req.attachment
     await session.commit()
     return BrandResponse(
-        data=BrandDataResponse(
-            id=brand.id,
-            name=brand.name,
-            description=brand.description,
-            attachment=brand.attachment
-        ),
+        data=BrandDataResponse.from_entity(brand),
         message="Brand updated successfully"
     )
 
@@ -120,11 +89,6 @@ async def delete_brand(id: str, session: AsyncSession) -> BrandResponse:
     await session.delete(brand)
     await session.commit()
     return BrandResponse(
-        data=BrandDataResponse(
-            id=brand.id,
-            name=brand.name,
-            description=brand.description,
-            attachment=brand.attachment
-        ),
+        data=BrandDataResponse.from_entity(brand),
         message="Brand deleted successfully"
     )
