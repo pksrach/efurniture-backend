@@ -13,7 +13,7 @@ async def get_colors(session: AsyncSession) -> ColorListResponse:
     stmt = select(Color).order_by(Color.created_at.desc())
     result = await session.execute(stmt)
     colors = result.scalars().all()
-    return ColorListResponse.from_entities(colors)
+    return ColorListResponse.from_entities(list(colors))
 
 
 async def get_color(id: str, session: AsyncSession) -> ColorResponse:

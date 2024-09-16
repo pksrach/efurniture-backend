@@ -36,12 +36,12 @@ class CustomerDataResponse(BaseModel):
         return cls(
             id=customer.id,
             name=customer.name,
-            username=customer.username,
-            email=customer.email,
+            username=customer.user.username,
+            email=customer.user.email,
             gender=Genders.get_name(customer.gender),
             phone_number=customer.phone_number,
             address=customer.address,
-            active=customer.is_active,
+            active=customer.user.is_active,
             created_at=customer.created_at
         )
 

@@ -64,4 +64,4 @@ async def get_customers(session: AsyncSession) -> CustomerListResponse:
     )
     result = await session.execute(stmt)
     customers = result.scalars().all()
-    return CustomerListResponse.from_entities(customers)
+    return CustomerListResponse.from_entities(list(customers))

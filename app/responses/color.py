@@ -38,7 +38,7 @@ class ColorResponse(BaseResponse):
             return cls(data=None, message="Color not found")
 
         return cls(
-            data=ColorDataResponse.from_orm(color),
+            data=ColorDataResponse.from_entity(color),
             message="Color fetched successfully"
         )
 
@@ -49,6 +49,6 @@ class ColorListResponse(BaseResponse):
     @classmethod
     def from_entities(cls, colors):
         return cls(
-            data=[ColorDataResponse.from_orm(color) for color in colors],
+            data=[ColorDataResponse.from_entity(color) for color in colors],
             message="Colors fetched successfully"
         )

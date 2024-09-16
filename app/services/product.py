@@ -46,7 +46,7 @@ async def create_product(req: ProductRequest, session: AsyncSession) -> ProductR
         # Check exists name or not
         stmt = select(Product).where(Product.name == req.name)
         result = await session.execute(stmt)
-        product = result.scalars().first()
+        product = result.scalar()
         if product:
             return ProductResponse(
                 data=ProductDataResponse(
