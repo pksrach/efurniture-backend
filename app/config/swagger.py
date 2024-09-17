@@ -20,6 +20,9 @@ def custom_openapi(app: FastAPI):
         {"name": "Backend Product API", "description": "Operations for product management in the backend"},
         {"name": "Backend User API", "description": "Operations for user management in the backend"},
         {"name": "Backend Customer API", "description": "Operations for customer management in the backend"},
+        {"name": "Backend Payment Method API", "description": "Operations for payment method management in the backend"},
+        {"name": "Backend Location API", "description": "Operations for location management in the backend"},
+        {"name": "Backend Product Rate API", "description": "Operations for product rate management in the backend"},
 
         {"name": "Frontend API", "description": "Operations for frontend API"},
         {"name": "Default", "description": "Default operations"},
