@@ -15,6 +15,9 @@ color_router = APIRouter(
 async def get_colors(session: AsyncSession = Depends(get_session)):
     return await color.get_colors(session)
 
+@color_router.post("/list-paginated",status_code=200)
+async def get_paginated_colors(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
+    return await color.get_paginated_colors(session,page,limit)
 
 @color_router.get("/{id}", status_code=200)
 async def get_color(id: str, session: AsyncSession = Depends(get_session)):

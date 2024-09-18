@@ -8,21 +8,21 @@ def custom_openapi(app: FastAPI):
     openapi_schema = get_openapi(
         title="E-Furniture API",
         version="0.1.0",
-        description="This is a very fancy project, with auto docs for the API and everything.",
+        description="API documentation for E-Furniture platform, providing access to backend and frontend operations for managing products, users, and more.",
         routes=app.routes,
     )
     openapi_schema["tags"] = [
-        {"name": "Auth API", "description": "Operations for backend API"},
+        {"name": "Auth API", "description": "Authentication and authorization operations."},
 
-        {"name": "Backend Color API", "description": "Operations for color management in the backend"},
-        {"name": "Backend Category API", "description": "Operations for category management in the backend"},
-        {"name": "Backend Brand API", "description": "Operations for brand management in the backend"},
-        {"name": "Backend Product API", "description": "Operations for product management in the backend"},
-        {"name": "Backend User API", "description": "Operations for user management in the backend"},
-        {"name": "Backend Customer API", "description": "Operations for customer management in the backend"},
+        {"name": "Backend Color API", "description": "Endpoints for managing color-related data in the backend."},
+        {"name": "Backend Category API", "description": "Endpoints for managing categories in the backend."},
+        {"name": "Backend Brand API", "description": "Endpoints for managing brands in the backend."},
+        {"name": "Backend Product API", "description": "Endpoints for managing product details in the backend."},
+        {"name": "Backend User API", "description": "Endpoints for managing user accounts and roles in the backend."},
+        {"name": "Backend Customer API", "description": "Endpoints for managing customer information in the backend."},
 
-        {"name": "Frontend API", "description": "Operations for frontend API"},
-        {"name": "Default", "description": "Default operations"},
+        {"name": "Frontend API", "description": "Endpoints used for frontend operations and interactions."},
+        {"name": "Default", "description": "Default operations provided by the system."},
     ]
 
     openapi_schema["info"]["contact"] = {
@@ -30,7 +30,7 @@ def custom_openapi(app: FastAPI):
         "url": "https://www.setecu.com",
     }
     openapi_schema["externalDocs"] = {
-        "description": "Find more info here",
+        "description": "Additional information can be found here.",
         "url": "https://fastapi.tiangolo.com",
     }
     app.openapi_schema = openapi_schema
