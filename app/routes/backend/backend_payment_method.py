@@ -14,6 +14,10 @@ payment_method_router = APIRouter(
 async def get_payment_methods(session: AsyncSession = Depends(get_session)):
     return await payment_method.get_payment_methods(session)
 
+@payment_method_router.post("/list-paginated",status_code=200)
+async def get_paginated_payment_methods(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
+    return await payment_method.get_paginated_payment_methods(session,page,limit)
+
 @payment_method_router.get("/{id}", status_code=200)
 async def get_payment_method(id:str, session: AsyncSession = Depends(get_session)):
     return await payment_method.get_payment_method(id,session)

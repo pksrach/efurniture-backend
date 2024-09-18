@@ -14,6 +14,10 @@ product_rate_router = APIRouter(
 async def get_product_rates(session: AsyncSession = Depends(get_session)):
     return await product_rate.get_product_rates(session)
 
+@product_rate_router.post("/list-paginated",status_code=200)
+async def get_paginated_product_rates(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
+    return await product_rate.get_paginated_product_rates(session,page,limit)
+
 @product_rate_router.get("/{id}", status_code=200)
 async def get_product_rate(id:str, session: AsyncSession = Depends(get_session)):
     return await product_rate.get_product_rate(id,session)

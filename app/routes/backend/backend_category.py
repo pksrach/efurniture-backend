@@ -15,6 +15,9 @@ category_router = APIRouter(
 async def get_categories(session: AsyncSession = Depends(get_session)):
     return await category.get_categories(session)
 
+@category_router.post("/list-paginated",status_code=200)
+async def get_paginated_categories(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
+    return await category.get_paginated_categories(session,page,limit)
 
 @category_router.get("/{id}", status_code=200)
 async def get_category(id: str, session: AsyncSession = Depends(get_session)):

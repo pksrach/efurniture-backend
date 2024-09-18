@@ -15,6 +15,9 @@ brand_router = APIRouter(
 async def get_brands(session: AsyncSession = Depends(get_session)):
     return await brand.get_brands(session)
 
+@brand_router.post("/list-paginated",status_code=200)
+async def get_paginated_brands(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
+    return await brand.get_paginated_brands(session,page,limit)
 
 @brand_router.get("/{id}", status_code=200)
 async def get_brand(id: str, session: AsyncSession = Depends(get_session)):

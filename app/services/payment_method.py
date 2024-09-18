@@ -1,10 +1,11 @@
 from sqlalchemy.exc import IntegrityError
 from typing import Optional
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.settings import get_settings
 from app.models.payment_method import PaymentMethod
+from app.responses.paginated_response import PaginatedResponse
 from app.schemas.payment_method import PaymentMethodRequest
 from app.responses.payment_method import PaymentMethod,PaymentMethodDataResponse,PaymentMethodListResponse,PaymentMethodResponse
 import logging
@@ -17,12 +18,30 @@ async def _get_payment_method_by_id(id: str, session: AsyncSession) -> Optional[
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
 
-
 async def get_payment_methods(session: AsyncSession) -> PaymentMethodListResponse:
     stmt = select(PaymentMethod).order_by(PaymentMethod.created_at.desc())
     result = await session.execute(stmt)
     payment_methods = result.scalars().all()
     return PaymentMethodListResponse.from_entities(list(payment_methods))
+
+async def get_paginated_payment_methods(session: AsyncSession, page: int = 1, limit: int = 10)-> PaginatedResponse[PaymentMethodDataResponse]:
+    offset = (page - 1) * limit
+    total_items_query = await session.execute(select(func.count(PaymentMethod.id)))
+    total_items = total_items_query.scalar_one()
+    stmt = select(PaymentMethod).order_by(PaymentMethod.created_at.desc()).offset(offset).limit(limit)
+    result = await session.execute(stmt)
+    payment_methods = result.scalars().all()
+    total_pages = (total_items + limit - 1) // limit
+    payment_method_data = [PaymentMethodDataResponse.from_entity(payment_method) for payment_method in payment_methods]
+
+    return PaginatedResponse[PaymentMethodDataResponse](
+        data=payment_method_data,
+        message="Payment Methods retrieved successfully.",
+        page=page,
+        limit=limit,
+        total_items=total_items,
+        total_pages=total_pages,
+    )
 
 async def get_payment_method(id: str, session: AsyncSession) -> PaymentMethodResponse:
     payment_method = await _get_payment_method_by_id(id, session)

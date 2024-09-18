@@ -15,6 +15,9 @@ customer_router = APIRouter(
 async def get_customers(session: AsyncSession = Depends(get_session)):
     return await customer.get_customers(session)
 
+@customer_router.post("/list-paginated",status_code=200)
+async def get_paginated_customers(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
+    return await customer.get_paginated_customers(session,page,limit)
 
 @customer_router.get("/{id}", status_code=200)
 async def get_customer(id: str, session: AsyncSession = Depends(get_session)):

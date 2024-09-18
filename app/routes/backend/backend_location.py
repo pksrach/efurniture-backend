@@ -14,6 +14,10 @@ location_router = APIRouter(
 async def get_locations(session: AsyncSession = Depends(get_session)):
     return await location.get_locations(session)
 
+@location_router.post("/list-paginated",status_code=200)
+async def get_paginated_locations(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
+    return await location.get_paginated_locations(session,page,limit)
+
 @location_router.get("/{id}", status_code=200)
 async def get_location(id: str, session: AsyncSession = Depends(get_session)):
     return await location.get_location(id, session)

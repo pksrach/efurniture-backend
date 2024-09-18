@@ -18,20 +18,12 @@ async def get_colors(session: AsyncSession) -> ColorListResponse:
 
 async def get_paginated_colors(session: AsyncSession, page: int = 1, limit: int = 10) -> PaginatedResponse[ColorDataResponse]:
     offset = (page - 1) * limit
-
-    # Query for total items
     total_items_query = await session.execute(select(func.count(Color.id)))
     total_items = total_items_query.scalar_one()
-
-    # Fetch paginated colors
     stmt = select(Color).order_by(Color.created_at.desc()).offset(offset).limit(limit)
     result = await session.execute(stmt)
     colors = result.scalars().all()
-
-    # Calculate total pages
     total_pages = (total_items + limit - 1) // limit
-
-    # Use from_entity to map ORM results to Pydantic model
     color_data = [ColorDataResponse.from_entity(color) for color in colors]
 
     return PaginatedResponse[ColorDataResponse](
