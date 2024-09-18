@@ -2,8 +2,8 @@ from sqlalchemy import Column, ForeignKey, String, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
-from app.models.color import Color # Ensure Color is imported
-from app.models.product import Product # Ensure Product is imported
+from app.models.color import Color
+from app.models.product import Product
 
 import uuid
 
