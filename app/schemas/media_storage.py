@@ -11,7 +11,7 @@ class MediaStorageCreate(BaseModel):
     reference_id: Optional[UUID]
     entity_type: Optional[str]
 
-class MediaStorageResponse(BaseModel):
+class MediaStorageResponseSchema(BaseModel):
     id: UUID
     name: Optional[str]
     unique_name: Optional[str]

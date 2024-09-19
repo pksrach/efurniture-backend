@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config.settings import get_settings
 from app.models.media_storage import MediaStorage
 from app.responses.media_storage import MediaStorage,MediaStorageDataResponse,MediaStorageListResponse,MediaStorageResponse
+from app.schemas.media_storage import MediaStorageResponseSchema
 from app.utils.common import is_valid_file_type,get_file_path
 import logging
 from datetime import datetime
@@ -15,7 +16,7 @@ from datetime import datetime
 logger = logging.getLogger(__name__)
 settings = get_settings()
 
-async def post_file(session: AsyncSession,file: UploadFile, entity_type: Optional[str],reference_id: UUID)-> MediaStorageResponse:
+async def post_file(session: AsyncSession,file: UploadFile, entity_type: Optional[str],reference_id: UUID)-> MediaStorageResponseSchema:
     # Max file size is 3MB
     max_file_size = 3 * 1024 * 1024
 

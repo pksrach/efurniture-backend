@@ -43,7 +43,7 @@ async def update_category(id: str, req: category.CategoryRequest, session: Async
 async def delete_category(id: str, session: AsyncSession = Depends(get_session)):
     return await category.delete_category(id, session)
 
-@category_router.post("/upload-file-category", response_model=MediaStorageResponse, status_code=200)
+@category_router.post("/upload-file-category", status_code=200)
 async def post_image_category(
     file: UploadFile,
     entity_type: Optional[str],
