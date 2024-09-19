@@ -1,8 +1,8 @@
 import os
 import uuid
-from typing import Optional
+from typing import List, Optional
 from fastapi import UploadFile, HTTPException
-from sqlalchemy import UUID
+from sqlalchemy import UUID, and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.config.settings import get_settings
 from app.models.media_storage import MediaStorage
@@ -57,3 +57,58 @@ async def post_file(session: AsyncSession,file: UploadFile, entity_type: Optiona
 
     except Exception as ex:
         raise HTTPException(status_code=500, detail=f"Failed processing file {file.filename}. {str(ex)}")
+    
+async def get_all_media_storage_by_ref_id(session: AsyncSession, reference_id: UUID,entity_type: Optional[str])-> List[MediaStorageResponse]:
+    query = (
+        select(MediaStorage)
+        .where(
+            and_(
+                MediaStorage.reference_id == reference_id,
+                MediaStorage.entity_type == entity_type,
+            )
+        )
+    )
+    result = await session.execute(query)
+    media_storages = result.scalars().all()
+    return media_storages
+
+async def get_media_storage_by_ref_id(session: AsyncSession, reference_id: UUID,entity_type: Optional[str])-> MediaStorageResponse:
+    query = (
+        select(MediaStorage)
+        .where(
+            and_(
+                MediaStorage.reference_id == reference_id,
+                MediaStorage.entity_type == entity_type,
+            )
+        )
+    )
+    result = await session.execute(query)
+    media_storage = result.scalars().first()
+    return media_storage
+
+async def find_media_storage_by_id(id: UUID, session: AsyncSession) -> MediaStorageResponse:
+    return await session.get(MediaStorage, id)
+    
+async def get_all_media_storage_by_entity_type(session: AsyncSession,entity_type: Optional[str])-> List[MediaStorageResponse]:
+    if not entity_type:
+        raise HTTPException(status_code=400, detail="Entity type cannot be null or empty.")
+    
+    query = (
+        select(MediaStorage)
+        .where(
+            and_(
+                MediaStorage.entity_type == entity_type,
+            )
+        )
+    )
+    result = await session.execute(query)
+    media_storages = result.scalars().all() 
+    return media_storages
+
+async def delete_media_storage_by_id(id: UUID, session: AsyncSession) -> str:
+    media_storage = await session.get(MediaStorage, id)
+    if not media_storage:
+        raise HTTPException(status_code=404, detail="Media storage not found.")
+    await session.delete(media_storage)
+    await session.commit()
+    return f"Media storage {id} deleted successfully"

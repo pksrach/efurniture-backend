@@ -50,7 +50,10 @@ async def post_image_category(
     session: AsyncSession = Depends(get_session)
 ):
     try:
-        return await media_storage.post_file(session, file,"CATEGORY", reference_id)
+        return await media_storage.post_file(session, file,"Category", reference_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+
     
