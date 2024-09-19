@@ -125,3 +125,6 @@ dmypy.json
 /app/__pycache__/
 /app/*.db
 .vercel
+
+# Image 
+uploads/*
