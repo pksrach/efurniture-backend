@@ -10,6 +10,7 @@ from app.models.brand import *
 from app.models.color import *
 from app.models.customer import *
 from app.models.location import *
+from app.models.media_storage import *
 from app.models.notification import *
 from app.models.order_detail import *
 from app.models.order import *

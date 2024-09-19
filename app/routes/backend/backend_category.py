@@ -1,8 +1,12 @@
-from fastapi import APIRouter, Depends
+from typing import Optional
+from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
+from sqlalchemy import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.database import get_session
+from app.schemas.media_storage import MediaStorageResponse
 from app.services import category
+from app.services import media_storage
 
 category_router = APIRouter(
     prefix="/categories",
@@ -37,3 +41,16 @@ async def update_category(id: str, req: category.CategoryRequest, session: Async
 @category_router.delete("/{id}", status_code=200)
 async def delete_category(id: str, session: AsyncSession = Depends(get_session)):
     return await category.delete_category(id, session)
+
+@category_router.post("/upload-file-category", response_model=MediaStorageResponse, status_code=200)
+async def post_image_category(
+    file: UploadFile,
+    entity_type: Optional[str],
+    reference_id: Optional[str],
+    session: AsyncSession = Depends(get_session)
+):
+    try:
+        return await media_storage.post_file(session, file,"CATEGORY", reference_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
