@@ -1,12 +1,13 @@
 import os
 import uuid
-from typing import List, Optional
+from typing import Optional
 from fastapi import UploadFile, HTTPException
-from sqlalchemy import UUID, and_, select
+from sqlalchemy import and_, select
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.config.settings import get_settings
 from app.models.media_storage import MediaStorage
-from app.schemas.media_storage import MediaStorageCreate,MediaStorageResponse
+from app.responses.media_storage import MediaStorage,MediaStorageDataResponse,MediaStorageListResponse,MediaStorageResponse
 from app.utils.common import is_valid_file_type,get_file_path
 import logging
 from datetime import datetime
@@ -58,7 +59,7 @@ async def post_file(session: AsyncSession,file: UploadFile, entity_type: Optiona
     except Exception as ex:
         raise HTTPException(status_code=500, detail=f"Failed processing file {file.filename}. {str(ex)}")
     
-async def get_all_media_storage_by_ref_id(session: AsyncSession, reference_id: UUID,entity_type: Optional[str])-> List[MediaStorageResponse]:
+async def get_all_media_storage_by_ref_id(session: AsyncSession, reference_id: UUID,entity_type: Optional[str])-> MediaStorageListResponse:
     query = (
         select(MediaStorage)
         .where(
@@ -70,7 +71,7 @@ async def get_all_media_storage_by_ref_id(session: AsyncSession, reference_id: U
     )
     result = await session.execute(query)
     media_storages = result.scalars().all()
-    return media_storages
+    return MediaStorageListResponse.from_entities(list(media_storages))
 
 async def get_media_storage_by_ref_id(session: AsyncSession, reference_id: UUID,entity_type: Optional[str])-> MediaStorageResponse:
     query = (
@@ -89,7 +90,7 @@ async def get_media_storage_by_ref_id(session: AsyncSession, reference_id: UUID,
 async def find_media_storage_by_id(id: UUID, session: AsyncSession) -> MediaStorageResponse:
     return await session.get(MediaStorage, id)
     
-async def get_all_media_storage_by_entity_type(session: AsyncSession,entity_type: Optional[str])-> List[MediaStorageResponse]:
+async def get_all_media_storage_by_entity_type(session: AsyncSession,entity_type: Optional[str])-> MediaStorageListResponse:
     if not entity_type:
         raise HTTPException(status_code=400, detail="Entity type cannot be null or empty.")
     

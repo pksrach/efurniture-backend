@@ -1,10 +1,11 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, Form, HTTPException, UploadFile
-from sqlalchemy import UUID
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.database import get_session
-from app.schemas.media_storage import MediaStorageResponse
+from app.responses.media_storage import MediaStorage,MediaStorageDataResponse,MediaStorageListResponse,MediaStorageResponse
+
 from app.services import category
 from app.services import media_storage
 
@@ -54,6 +55,12 @@ async def post_image_category(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@category_router.get("/get-all-media-storage-by-ref-id/{reference_id}/{entity_type}",status_code=200)
+async def get_all_media_storage_by_ref_id(reference_id: str,entity_type: Optional[str],session: AsyncSession = Depends(get_session)):
+    media_storages = await media_storage.get_all_media_storage_by_ref_id(session,reference_id, entity_type)
 
-
+    if not media_storages:
+        raise HTTPException(status_code=404, detail="Media storage not found.")
+    
+    return media_storages
     
