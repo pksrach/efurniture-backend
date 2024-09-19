@@ -3,6 +3,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from app.models.product import Product
+from app.models.product_price import ProductPrice
 from app.responses.base import BaseResponse
 
 
@@ -11,13 +12,33 @@ class KeyValueResponse(BaseModel):
     value: str | None
 
 
+class ProductPriceDataResponse(BaseModel):
+    id: str | UUID
+    color: KeyValueResponse | None
+    size: str | None
+    price: float
+
+    @classmethod
+    def from_entity(cls, product_price: 'ProductPrice') -> 'ProductPriceDataResponse':
+        return cls(
+            id=product_price.id,
+            color=KeyValueResponse(
+                key=str(product_price.color_id),
+                value=product_price.color.name
+            ) if product_price.color else None,
+            size=product_price.size,
+            price=product_price.price,
+        )
+
+
 class ProductDataResponse(BaseModel):
     id: str | UUID
     name: str
     description: str | None
     attachment: str | None
-    category: str | None
-    brand: str | None
+    category: KeyValueResponse | None
+    product_prices: list[ProductPriceDataResponse] | None
+    brand: KeyValueResponse | None
     is_active: bool
 
     @classmethod
@@ -27,8 +48,17 @@ class ProductDataResponse(BaseModel):
             name=product.name,
             description=product.description,
             attachment=product.attachment,
-            category=str(product.category_id),
-            brand=str(product.brand_id),
+            category=KeyValueResponse(
+                key=str(product.category_id),
+                value=product.category.name
+            ) if product.category else None,
+            brand=KeyValueResponse(
+                key=str(product.brand_id),
+                value=product.brand.name
+            ) if product.brand else None,
+            product_prices=[
+                ProductPriceDataResponse.from_entity(product_price) for product_price in product.product_prices
+            ] if product.product_prices else None,
             is_active=product.is_active,
         )
 

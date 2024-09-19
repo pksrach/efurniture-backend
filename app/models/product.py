@@ -21,4 +21,4 @@ class Product(BaseModel):
 
     category = relationship('Category', back_populates="products")
     brand = relationship('Brand', back_populates="products")
-    product_prices = relationship("ProductPrice", back_populates="product")
+    product_prices = relationship("ProductPrice", back_populates="product", cascade="all, delete-orphan")
