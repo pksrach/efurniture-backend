@@ -63,4 +63,25 @@ async def get_all_media_storage_by_ref_id(reference_id: str,entity_type: Optiona
         raise HTTPException(status_code=404, detail="Media storage not found.")
     
     return media_storages
+
+@category_router.get("/get-media-storage-by-ref-id/{reference_id}/{entity_type}",status_code=200)
+async def get_media_storage_by_ref_id(reference_id: str,entity_type: Optional[str],session: AsyncSession = Depends(get_session)):
+    media = await media_storage.get_media_storage_by_ref_id(session,reference_id, entity_type)
+
+    if not media:
+        raise HTTPException(status_code=404, detail="Media storage not found.")
+
+    return media
+
+@category_router.get("/get-all-media-storage-by-entity-type/{entity_type}",status_code=200)
+async def get_all_media_storage_by_entity_type(entity_type: Optional[str],session: AsyncSession = Depends(get_session)):
+    media_storages = await media_storage.get_all_media_storage_by_entity_type(session,entity_type)
+
+    if not media_storages:
+        raise HTTPException(status_code=404, detail="Media storage not found.")
     
+    return media_storages
+
+@category_router.delete("/delete-media-storage/{id}", status_code=200)
+async def delete_media_storage(id: str, session: AsyncSession = Depends(get_session)):
+    return await media_storage.delete_media_storage_by_id(id,session)
