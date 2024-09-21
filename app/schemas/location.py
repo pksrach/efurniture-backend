@@ -8,7 +8,7 @@ class LocationRequest(BaseModel):
     parent_id: Optional[UUID] = None
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "name": "New York",
                 "price": 150.00,

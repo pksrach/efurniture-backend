@@ -22,4 +22,4 @@ class MediaStorageResponseSchema(BaseModel):
     entity_type: Optional[str]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
