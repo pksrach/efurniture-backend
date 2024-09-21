@@ -1,14 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config.settings import get_settings
 from app.models.category import Category
 from app.responses.category import CategoryDataResponse, CategoryResponse
 from app.responses.paginated_response import PaginationParam
 from app.schemas.category import CategoryRequest
 from app.services.base_service import fetch_paginated_data
-
-settings = get_settings()
 
 
 async def get_categories(session: AsyncSession, pagination: PaginationParam):

@@ -8,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 
-from app.config.security import generate_token, get_token_payload, hash_password, load_user, str_decode, str_encode, verify_password, is_password_long_enough
+from app.config.security import generate_token, get_token_payload, hash_password, load_user, str_decode, str_encode, \
+    verify_password, is_password_long_enough
 from app.config.settings import get_settings
 from app.constants.roles import Roles
 from app.models.customer import Customer
@@ -24,6 +25,16 @@ settings = get_settings()
 
 async def create_user_account(data: RegisterUserRequest, session: AsyncSession) -> UserResponse:
     try:
+        # validate
+        if not data.email:
+            raise HTTPException(status_code=400, detail="Email is required.")
+
+        if not data.username:
+            raise HTTPException(status_code=400, detail="Username is required.")
+
+        if not data.password:
+            raise HTTPException(status_code=400, detail="Password is required.")
+
         async with session.begin():
             stmt = select(User).where(or_(User.email == data.email, User.username == data.username))
             result = await session.execute(stmt)

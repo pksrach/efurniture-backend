@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.database import get_session
+from app.responses.paginated_response import PaginationParam
 from app.services import brand
 
 brand_router = APIRouter(
@@ -12,12 +13,10 @@ brand_router = APIRouter(
 
 
 @brand_router.get("", status_code=200)
-async def get_brands(session: AsyncSession = Depends(get_session)):
-    return await brand.get_brands(session)
+async def get_brands(session: AsyncSession = Depends(get_session),
+                     pagination: PaginationParam = Depends(PaginationParam)):
+    return await brand.get_brands(session, pagination)
 
-@brand_router.post("/list-paginated",status_code=200)
-async def get_paginated_brands(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
-    return await brand.get_paginated_brands(session,page,limit)
 
 @brand_router.get("/{id}", status_code=200)
 async def get_brand(id: str, session: AsyncSession = Depends(get_session)):
