@@ -1,39 +1,23 @@
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config.settings import get_settings
 from app.models.color import Color
-from app.responses.color import ColorListResponse, ColorDataResponse, ColorResponse
-from app.responses.paginated_response import PaginatedResponse
+from app.responses.color import ColorDataResponse, ColorResponse
+from app.responses.paginated_response import PaginationParam
 from app.schemas.color import ColorRequest
+from app.services.base_service import fetch_paginated_data
 
-settings = get_settings()
 
-
-async def get_colors(session: AsyncSession) -> ColorListResponse:
-    stmt = select(Color).order_by(Color.created_at.desc())
-    result = await session.execute(stmt)
-    colors = result.scalars().all()
-    return ColorListResponse.from_entities(list(colors))
-
-async def get_paginated_colors(session: AsyncSession, page: int = 1, limit: int = 10) -> PaginatedResponse[ColorDataResponse]:
-    offset = (page - 1) * limit
-    total_items_query = await session.execute(select(func.count(Color.id)))
-    total_items = total_items_query.scalar_one()
-    stmt = select(Color).order_by(Color.created_at.desc()).offset(offset).limit(limit)
-    result = await session.execute(stmt)
-    colors = result.scalars().all()
-    total_pages = (total_items + limit - 1) // limit
-    color_data = [ColorDataResponse.from_entity(color) for color in colors]
-
-    return PaginatedResponse[ColorDataResponse](
-        data=color_data,
-        message="Colors retrieved successfully.",
-        page=page,
-        limit=limit,
-        total_items=total_items,
-        total_pages=total_pages,
+async def get_colors(session: AsyncSession, pagination: PaginationParam):
+    return await fetch_paginated_data(
+        session=session,
+        entity=Color,
+        pagination=pagination,
+        data_response_model=ColorDataResponse,
+        order_by_field=Color.created_at,
+        message="Colors fetched successfully"
     )
+
 
 async def get_color(id: str, session: AsyncSession) -> ColorResponse:
     stmt = select(Color).where(Color.id == id)

@@ -1,47 +1,34 @@
-from sqlalchemy.exc import IntegrityError
+import logging
 from typing import Optional
-from sqlalchemy import func, select
+
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config.settings import get_settings
-from app.models.payment_method import PaymentMethod
-from app.responses.paginated_response import PaginatedResponse
+from app.responses.paginated_response import PaginationParam
+from app.responses.payment_method import PaymentMethod, PaymentMethodDataResponse, PaymentMethodResponse
 from app.schemas.payment_method import PaymentMethodRequest
-from app.responses.payment_method import PaymentMethod,PaymentMethodDataResponse,PaymentMethodListResponse,PaymentMethodResponse
-import logging
+from app.services.base_service import fetch_paginated_data
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
+
 
 async def _get_payment_method_by_id(id: str, session: AsyncSession) -> Optional[PaymentMethod]:
     stmt = select(PaymentMethod).where(PaymentMethod.id == id)
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
 
-async def get_payment_methods(session: AsyncSession) -> PaymentMethodListResponse:
-    stmt = select(PaymentMethod).order_by(PaymentMethod.created_at.desc())
-    result = await session.execute(stmt)
-    payment_methods = result.scalars().all()
-    return PaymentMethodListResponse.from_entities(list(payment_methods))
 
-async def get_paginated_payment_methods(session: AsyncSession, page: int = 1, limit: int = 10)-> PaginatedResponse[PaymentMethodDataResponse]:
-    offset = (page - 1) * limit
-    total_items_query = await session.execute(select(func.count(PaymentMethod.id)))
-    total_items = total_items_query.scalar_one()
-    stmt = select(PaymentMethod).order_by(PaymentMethod.created_at.desc()).offset(offset).limit(limit)
-    result = await session.execute(stmt)
-    payment_methods = result.scalars().all()
-    total_pages = (total_items + limit - 1) // limit
-    payment_method_data = [PaymentMethodDataResponse.from_entity(payment_method) for payment_method in payment_methods]
-
-    return PaginatedResponse[PaymentMethodDataResponse](
-        data=payment_method_data,
-        message="Payment Methods retrieved successfully.",
-        page=page,
-        limit=limit,
-        total_items=total_items,
-        total_pages=total_pages,
+async def get_payment_methods(session: AsyncSession, pagination: PaginationParam):
+    return await fetch_paginated_data(
+        session=session,
+        entity=PaymentMethod,
+        pagination=pagination,
+        data_response_model=PaymentMethodDataResponse,
+        order_by_field=PaymentMethod.created_at,
+        message="Payment methods fetched successfully"
     )
+
 
 async def get_payment_method(id: str, session: AsyncSession) -> PaymentMethodResponse:
     payment_method = await _get_payment_method_by_id(id, session)
@@ -53,6 +40,7 @@ async def get_payment_method(id: str, session: AsyncSession) -> PaymentMethodRes
             message="Payment method not found"
         )
     return PaymentMethodResponse.from_entity(payment_method)
+
 
 async def create_payment_method(req: PaymentMethodRequest, session: AsyncSession) -> PaymentMethodResponse:
     """Create a new payment method with the provided data."""
@@ -85,6 +73,7 @@ async def create_payment_method(req: PaymentMethodRequest, session: AsyncSession
             message="Failed to create payment method due to database integrity error."
         )
 
+
 async def update_payment_method(id: str, req: PaymentMethodRequest, session: AsyncSession) -> PaymentMethodResponse:
     """Update a payment method by ID with the provided data."""
     payment_method = await _get_payment_method_by_id(id, session)
@@ -116,7 +105,8 @@ async def update_payment_method(id: str, req: PaymentMethodRequest, session: Asy
             message="Failed to update payment method due to database integrity error."
         )
 
-async def delete_payment_method(id: str, session: AsyncSession)-> PaymentMethodResponse:
+
+async def delete_payment_method(id: str, session: AsyncSession) -> PaymentMethodResponse:
     stmt = select(PaymentMethod).where(PaymentMethod.id == id)
     result = await session.execute(stmt)
     payment_method = result.scalar()
@@ -126,7 +116,7 @@ async def delete_payment_method(id: str, session: AsyncSession)-> PaymentMethodR
             data=None,
             message="Payment Method not found"
         )
-    
+
     await session.delete(payment_method)
     await session.commit()
     return PaymentMethodResponse(

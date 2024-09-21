@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.database import get_session
+from app.responses.paginated_response import PaginationParam
 from app.schemas.product import ProductRequest
 from app.services import product
 
@@ -13,8 +14,8 @@ product_router = APIRouter(
 
 
 @product_router.get("", status_code=200)
-async def get_products(session: AsyncSession = Depends(get_session)):
-    return await product.get_products(session)
+async def get_products(session: AsyncSession = Depends(get_session), pagination: PaginationParam = Depends(PaginationParam)):
+    return await product.get_products(session, pagination)
 
 
 @product_router.get("/{id}", status_code=200)

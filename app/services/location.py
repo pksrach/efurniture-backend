@@ -1,47 +1,38 @@
-from sqlalchemy.exc import IntegrityError
-from typing import Optional
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.config.settings import get_settings
-from app.models.location import Location
-from app.responses.paginated_response import PaginatedResponse
-from app.schemas.location import LocationRequest
-from app.responses.location import Location,LocationDataResponse,LocationListResponse,LocationResponse
 import logging
+from typing import Optional
+
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+
+from app.responses.location import Location, LocationDataResponse, LocationResponse
+from app.responses.paginated_response import PaginationParam
+from app.schemas.location import LocationRequest
+from app.services.base_service import fetch_paginated_data
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
+
 
 async def _get_location_by_id(id: str, session: AsyncSession) -> Optional[Location]:
-    stmt = select(Location).where(Location.id == id)
+    stmt = select(Location).options(joinedload(Location.parent)).where(Location.id == id)
     result = await session.execute(stmt)
-    return result.scalar_one_or_none()
+    return result.unique().scalar_one()
 
-async def get_locations(session: AsyncSession) -> LocationListResponse:
-    stmt = select(Location).order_by(Location.created_at.desc())
-    result = await session.execute(stmt)
-    locations = result.scalars().all()
-    return LocationListResponse.from_entities(list(locations))
 
-async def get_paginated_locations(session: AsyncSession, page: int = 1, limit: int = 10) -> PaginatedResponse[LocationDataResponse]:
-    offset = (page - 1) * limit
-    total_items_query = await session.execute(select(func.count(Location.id)))
-    total_items = total_items_query.scalar_one()
-    stmt = select(Location).order_by(Location.created_at.desc()).offset(offset).limit(limit)
-    result = await session.execute(stmt)
-    locations = result.scalars().all()
-    total_pages = (total_items + limit - 1) // limit
-    location_data = [LocationDataResponse.from_entity(location) for location in locations]
+async def get_locations(session: AsyncSession, pagination: PaginationParam):
+    stmt = select(Location).options(joinedload(Location.parent)).order_by(Location.created_at)
 
-    return PaginatedResponse[LocationDataResponse](
-        data=location_data,
-        message="Locations retrieved successfully.",
-        page=page,
-        limit=limit,
-        total_items=total_items,
-        total_pages=total_pages,
+    return await fetch_paginated_data(
+        session=session,
+        stmt=stmt,
+        entity=Location,
+        pagination=pagination,
+        data_response_model=LocationDataResponse,
+        order_by_field=Location.created_at,
+        message="Locations fetched successfully"
     )
+
 
 async def get_location(id: str, session: AsyncSession) -> LocationResponse:
     location = await _get_location_by_id(id, session)
@@ -53,6 +44,7 @@ async def get_location(id: str, session: AsyncSession) -> LocationResponse:
             message="Location not found"
         )
     return LocationResponse.from_entity(location)
+
 
 async def create_location(req: LocationRequest, session: AsyncSession) -> LocationResponse:
     """Create a new location with the provided data."""
@@ -79,6 +71,7 @@ async def create_location(req: LocationRequest, session: AsyncSession) -> Locati
             data=None,
             message="Failed to create location due to database integrity error."
         )
+
 
 async def update_location(id: str, req: LocationRequest, session: AsyncSession) -> LocationResponse:
     """Update a Location by ID with the provided data."""
@@ -111,7 +104,8 @@ async def update_location(id: str, req: LocationRequest, session: AsyncSession) 
             message="Failed to update Location due to database integrity error."
         )
 
-async def delete_location(id: str, session: AsyncSession)-> LocationResponse:
+
+async def delete_location(id: str, session: AsyncSession) -> LocationResponse:
     stmt = select(Location).where(Location.id == id)
     result = await session.execute(stmt)
     location = result.scalar()
@@ -121,7 +115,7 @@ async def delete_location(id: str, session: AsyncSession)-> LocationResponse:
             data=None,
             message="Location not found"
         )
-    
+
     await session.delete(location)
     await session.commit()
     return LocationResponse(

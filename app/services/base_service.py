@@ -1,4 +1,4 @@
-from typing import List, Union, TypeVar
+from typing import List, Union, TypeVar, Optional
 
 from sqlalchemy import select, func, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,10 +11,11 @@ T = TypeVar("T")
 
 async def fetch_paginated_data(
         session: AsyncSession,
-        entity,
-        pagination: PaginationParam,
-        data_response_model,
-        order_by_field,
+        stmt: Optional[select] = None,
+        entity=None,
+        pagination: PaginationParam = PaginationParam(),
+        data_response_model=None,
+        order_by_field=None,
         message: str = "Data fetched successfully",
 ) -> Union[PaginatedResponse, BaseResponse, List[T]]:
     """
@@ -30,14 +31,16 @@ async def fetch_paginated_data(
     Returns:
         PaginatedResponse or BaseResponse or List of data response model
         :param session:
+        :param stmt:
         :param entity:
         :param pagination:
         :param data_response_model:
         :param order_by_field:
         :param message:
     """
-    # Create the base query
-    stmt = select(entity)
+    # Create the base query if stmt is not provided
+    if stmt is None:
+        stmt = select(entity)
 
     # Apply search filter if provided
     if pagination.search:

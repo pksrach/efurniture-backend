@@ -11,13 +11,15 @@ from app.models.category import Category
 from app.models.color import Color
 from app.models.product import Product
 from app.models.product_price import ProductPrice
-from app.responses.product import ProductListResponse, ProductDataResponse, ProductResponse
+from app.responses.paginated_response import PaginationParam
+from app.responses.product import ProductDataResponse, ProductResponse
 from app.schemas.product import ProductRequest
+from app.services.base_service import fetch_paginated_data
 
 settings = get_settings()
 
 
-async def get_products(session: AsyncSession) -> ProductListResponse:
+async def get_products(session: AsyncSession, pagination: PaginationParam):
     stmt = (
         select(Product).options(
             selectinload(Product.category),
@@ -25,9 +27,16 @@ async def get_products(session: AsyncSession) -> ProductListResponse:
             selectinload(Product.product_prices).selectinload(ProductPrice.color)  # Load the color for product prices
         ).order_by(Product.created_at.desc())
     )
-    result = await session.execute(stmt)
-    products = result.scalars().all()
-    return ProductListResponse.from_entities(list(products))
+
+    return await fetch_paginated_data(
+        session=session,
+        stmt=stmt,
+        entity=Product,
+        pagination=pagination,
+        data_response_model=ProductDataResponse,
+        order_by_field=Product.created_at,
+        message="Products fetched successfully"
+    )
 
 
 async def get_product(id: str, session: AsyncSession) -> ProductResponse:

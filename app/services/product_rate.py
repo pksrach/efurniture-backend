@@ -1,47 +1,33 @@
-from sqlalchemy.exc import IntegrityError
+import logging
 from typing import Optional
-from sqlalchemy import func, select
+
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config.settings import get_settings
-from app.models.product_rate import ProductRate
-from app.responses.paginated_response import PaginatedResponse
+from app.responses.paginated_response import PaginationParam
+from app.responses.product_rate import ProductRate, ProductRateDataResponse, ProductRateResponse
 from app.schemas.product_rate import ProductRateRequest
-from app.responses.product_rate import ProductRate, ProductRateDataResponse,ProductRateListResponse,ProductRateResponse
-import logging
+from app.services.base_service import fetch_paginated_data
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
+
 
 async def _get_product_rate_by_id(id: str, session: AsyncSession) -> Optional[ProductRate]:
     stmt = select(ProductRate).where(ProductRate.id == id)
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
 
-async def get_product_rates(session: AsyncSession) -> ProductRateListResponse:
-    stmt = select(ProductRate).order_by(ProductRate.created_at.desc())
-    result = await session.execute(stmt)
-    product_rates = result.scalars().all()
-    return ProductRateListResponse.from_entities(list(product_rates))
 
-async def get_paginated_product_rates(session: AsyncSession, page: int = 1, limit: int = 10)-> PaginatedResponse[ProductRateDataResponse]:
-    offset = (page - 1) * limit
-    total_items_query = await session.execute(select(func.count(ProductRate.id)))
-    total_items = total_items_query.scalar_one()
-    stmt = select(ProductRate).order_by(ProductRate.created_at.desc()).offset(offset).limit(limit)
-    result = await session.execute(stmt)
-    product_rates = result.scalars().all()
-    total_pages = (total_items + limit - 1) // limit
-    product_rate_data = [ProductRateDataResponse.from_entity(product_rate) for product_rate in product_rates]
-
-    return PaginatedResponse[ProductRateDataResponse](
-        data=product_rate_data,
-        message="Product Rates retrieved successfully.",
-        page=page,
-        limit=limit,
-        total_items=total_items,
-        total_pages=total_pages,
+async def get_product_rates(session: AsyncSession, pagination: PaginationParam):
+    return await fetch_paginated_data(
+        session=session,
+        entity=ProductRate,
+        pagination=pagination,
+        data_response_model=ProductRateDataResponse,
+        order_by_field=ProductRate.created_at,
     )
+
 
 async def get_product_rate(id: str, session: AsyncSession) -> ProductRateResponse:
     product_rate = await _get_product_rate_by_id(id, session)
@@ -54,13 +40,14 @@ async def get_product_rate(id: str, session: AsyncSession) -> ProductRateRespons
         )
     return ProductRateResponse.from_entity(product_rate)
 
+
 async def create_product_rate(req: ProductRateRequest, session: AsyncSession) -> ProductRateResponse:
     """Create a new Product Rate with the provided data."""
     # Optionally check if a Product Rate with the same name exists
     product_rate = ProductRate(
-        user_id = req.user_id,
-        product_id = req.product_id,
-        rate = req.rate
+        user_id=req.user_id,
+        product_id=req.product_id,
+        rate=req.rate
     )
 
     try:
@@ -79,6 +66,7 @@ async def create_product_rate(req: ProductRateRequest, session: AsyncSession) ->
             data=None,
             message="Failed to create Product Rate due to database integrity error."
         )
+
 
 async def update_product_rate(id: str, req: ProductRateRequest, session: AsyncSession) -> ProductRateResponse:
     """Update a Product Rate by ID with the provided data."""
@@ -111,7 +99,8 @@ async def update_product_rate(id: str, req: ProductRateRequest, session: AsyncSe
             message="Failed to update Product Rate due to database integrity error."
         )
 
-async def delete_product_rate(id: str, session: AsyncSession)-> ProductRateResponse:
+
+async def delete_product_rate(id: str, session: AsyncSession) -> ProductRateResponse:
     stmt = select(ProductRate).where(ProductRate.id == id)
     result = await session.execute(stmt)
     product_rate = result.scalar()
@@ -121,7 +110,7 @@ async def delete_product_rate(id: str, session: AsyncSession)-> ProductRateRespo
             data=None,
             message="Product Rate not found"
         )
-    
+
     await session.delete(product_rate)
     await session.commit()
     return ProductRateResponse(

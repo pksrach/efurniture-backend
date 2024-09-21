@@ -27,7 +27,7 @@ class LocationDataResponse(BaseModel):
             name=location.name,
             price=float(location.price),  # Ensure that price is returned as float
             parent_id=location.parent_id,
-            children=[cls.from_entity(child) for child in location.children]
+            children=[cls.from_entity(child) for child in (location.children or [])]
         )
 
 

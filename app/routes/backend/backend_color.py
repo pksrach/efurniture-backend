@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config.database import get_session
+from app.responses.paginated_response import PaginationParam
 from app.services import color
 
 color_router = APIRouter(
@@ -12,12 +13,10 @@ color_router = APIRouter(
 
 
 @color_router.get("", status_code=200)
-async def get_colors(session: AsyncSession = Depends(get_session)):
-    return await color.get_colors(session)
+async def get_colors(session: AsyncSession = Depends(get_session),
+                     pagination: PaginationParam = Depends(PaginationParam)):
+    return await color.get_colors(session, pagination)
 
-@color_router.post("/list-paginated",status_code=200)
-async def get_paginated_colors(page: int = 1, limit: int = 10,session: AsyncSession = Depends(get_session)):
-    return await color.get_paginated_colors(session,page,limit)
 
 @color_router.get("/{id}", status_code=200)
 async def get_color(id: str, session: AsyncSession = Depends(get_session)):
