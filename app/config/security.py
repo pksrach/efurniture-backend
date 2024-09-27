@@ -78,13 +78,23 @@ def get_token_payload(token: str, secret: str, algo: str):
     return None
 
 
-def generate_token(user_id: uuid.UUID, secret: str, algo: str, expiry: timedelta, options: dict = None):
+def generate_token(user: User, expiry: timedelta, options: dict = None):
+    if user is None:
+        raise ValueError("User object cannot be None")
+
     expire = datetime.now() + expiry
+    user_id = str(user.id)
+    role = Roles.get_name(user.role)
     payload = {
         "sub": str(user_id),
+        "role": role,
         "exp": expire,
         "dict": dict() if options is None else options
     }
+
+    secret = settings.JWT_SECRET
+    algo = settings.JWT_ALGORITHM
+
     token = jwt.encode(payload, secret, algorithm=algo, headers={"typ": "JWT", "alg": algo})
     return token
 

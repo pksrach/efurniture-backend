@@ -11,6 +11,7 @@ from starlette.responses import JSONResponse
 
 from app.config.security import generate_token, verify_password, get_token_payload, hash_password
 from app.config.settings import get_settings
+from app.constants.roles import Roles
 from app.models.user import User
 from app.models.user_token import UserToken
 from app.responses.auth import TokenResponse, TokenData
@@ -34,8 +35,8 @@ async def auth_login(request: LoginRequest, session: AsyncSession) -> TokenRespo
         access_token_expiry = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         refresh_token_expiry = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
-        access_token = generate_token(user_exist.id, settings.JWT_SECRET, settings.JWT_ALGORITHM, access_token_expiry)
-        refresh_token = generate_token(user_exist.id, settings.JWT_SECRET, settings.JWT_ALGORITHM, refresh_token_expiry)
+        access_token = generate_token(user_exist, access_token_expiry)
+        refresh_token = generate_token(user_exist, refresh_token_expiry)
 
         return TokenResponse(
             message="Login successful.",
@@ -70,7 +71,7 @@ async def auth_refresh(refresh_token: str, session: AsyncSession) -> TokenRespon
         raise HTTPException(status_code=404, detail="User not found.")
 
     access_token_expiry = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = generate_token(user.id, settings.JWT_SECRET, settings.JWT_ALGORITHM, access_token_expiry)
+    access_token = generate_token(user, access_token_expiry)
 
     return TokenResponse(
         message="Login successful.",
@@ -114,9 +115,7 @@ async def auth_forgot_password(email: str, session: AsyncSession):
 
     # Generate a reset token
     expiry = 2  # in minutes
-    reset_token = generate_token(user.id, settings.JWT_SECRET, settings.JWT_ALGORITHM, timedelta(minutes=expiry),
-                                 {"code": reset_code})
-    print("reset_token", reset_token)
+    reset_token = generate_token(user.id, timedelta(minutes=expiry),{"code": reset_code})
 
     # Store the token in the database
     user_token = UserToken(
@@ -161,9 +160,8 @@ async def auth_verify_password(req: VerifyPasswordRequest, session: AsyncSession
     if req.code != payloadCode:
         raise HTTPException(status_code=400, detail="Invalid code.")
 
-    user_id = payload.get("sub")
     expiry = 5  # in minutes
-    access_token = generate_token(user_id, settings.JWT_SECRET, settings.JWT_ALGORITHM, timedelta(minutes=expiry))
+    access_token = generate_token(user_token, timedelta(minutes=expiry))
 
     return {
         "message": "Code verified successfully.",

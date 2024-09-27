@@ -17,7 +17,7 @@ guest_router = APIRouter(
 )
 
 
-@guest_router.post("/register", status_code=status.HTTP_201_CREATED, response_model=UserResponse)
+@guest_router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(data: RegisterUserRequest, session: AsyncSession = Depends(get_session)):
     return await user.create_user_account(data, session)
 
