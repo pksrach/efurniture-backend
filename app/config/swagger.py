@@ -23,6 +23,7 @@ def custom_openapi(app: FastAPI):
         {"name": "Backend Payment Method API", "description": "Endpoints for managing payment method information in the backend."},
         {"name": "Backend Product Rate API", "description": "Endpoints for managing product rate information in the backend."},
         {"name": "Backend Location API", "description": "Endpoints for managing location information in the backend."},
+        {"name": "Backend Media Storage API", "description": "Endpoints for managing media storage information in the backend."},
 
         {"name": "Frontend API", "description": "Endpoints used for frontend operations and interactions."},
         {"name": "Default", "description": "Default operations provided by the system."},

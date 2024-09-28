@@ -5,6 +5,7 @@ from app.routes.backend.backend_brand import brand_router
 from app.routes.backend.backend_category import category_router
 from app.routes.backend.backend_color import color_router
 from app.routes.backend.backend_customer import customer_router
+from app.routes.backend.backend_media_storage import media_router
 from app.routes.backend.backend_product import product_router
 from app.routes.backend.backend_user import backend_user_router
 from app.routes.backend.backend_payment_method import payment_method_router
@@ -26,3 +27,4 @@ backend_router.include_router(product_router, tags=["Backend Product API"])
 backend_router.include_router(payment_method_router,tags=["Backend Payment Method API"])
 backend_router.include_router(product_rate_router,tags=["Backend Product Rate API"])
 backend_router.include_router(location_router,tags=["Backend Location API"])
+backend_router.include_router(media_router, tags=["Backend Media Storage API"])
