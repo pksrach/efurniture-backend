@@ -5,14 +5,14 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from fastapi import UploadFile, HTTPException, Request
+from fastapi import UploadFile, Request
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.config.custom_exceptions import CustomHTTPException
 from app.responses.media_storage import MediaStorage, MediaStorageDataResponse, MediaStorageListResponse, \
     MediaStorageResponse
 from app.responses.paginated_response import PaginationParam
-from app.schemas.media_storage import MediaStorageResponseSchema
 from app.services.base_service import fetch_paginated_data
 from app.utils.common import is_valid_file_type, get_file_path
 
@@ -30,15 +30,15 @@ async def get_all_media_storage(session: AsyncSession, pagination: PaginationPar
     )
 
 
-async def get_media_storage(id: UUID, session: AsyncSession):
+async def get_media_storage(id: str, session: AsyncSession) -> MediaStorageResponse:
     media_storage = await session.get(MediaStorage, id)
     if not media_storage:
-        raise HTTPException(status_code=404, detail="Media storage not found.")
-    return media_storage
+        raise CustomHTTPException(status_code=404, message="Media storage not found.")
+    return MediaStorageResponse.from_entity(media_storage)
 
 
-async def add_media_storage(file: UploadFile, entity_type: Optional[str], reference_id: UUID, request: Request,
-                            session: AsyncSession) -> MediaStorageResponseSchema:
+async def add_media_storage(file: UploadFile, namespace: Optional[str], reference_id: UUID, request: Request,
+                            session: AsyncSession) -> MediaStorageResponse:
     # Max file size is 3MB
     max_file_size = 3 * 1024 * 1024
 
@@ -46,11 +46,11 @@ async def add_media_storage(file: UploadFile, entity_type: Optional[str], refere
     file_size = len(contents)
 
     if file_size > max_file_size:
-        raise HTTPException(status_code=400, detail="File size exceeds the maximum limit of 3MB.")
+        raise CustomHTTPException(status_code=400, message="File size exceeds the maximum limit of 3MB.")
 
     file_extension = os.path.splitext(file.filename)[1]
     if not is_valid_file_type(file_extension):
-        raise HTTPException(status_code=400, detail="Invalid file type. Only JPG, JPEG, and PNG are allowed.")
+        raise CustomHTTPException(status_code=400, message="Invalid file type. Only JPG, JPEG, and PNG are allowed.")
 
     unique_name = f"{uuid.uuid4()}{file_extension}"
     file_path = get_file_path(unique_name)
@@ -63,7 +63,7 @@ async def add_media_storage(file: UploadFile, entity_type: Optional[str], refere
         name=file.filename,
         extension=file_extension,
         uri=f"{base_url}uploads/{unique_name}",
-        entity_type=entity_type,
+        entity_type=namespace,
         reference_id=reference_id,
         created_on=datetime.now(),
     )
@@ -78,10 +78,10 @@ async def add_media_storage(file: UploadFile, entity_type: Optional[str], refere
         await session.commit()
         await session.refresh(media_storage)
 
-        return media_storage
+        return MediaStorageResponse.from_entity(media_storage)
 
     except Exception as ex:
-        raise HTTPException(status_code=500, detail=f"Failed processing file {file.filename}. {str(ex)}")
+        raise CustomHTTPException(status_code=500, message=f"Failed processing file {file.filename}. {str(ex)}")
 
 
 async def get_all_media_storage_by_ref_id(session: AsyncSession, reference_id: UUID,
@@ -123,7 +123,7 @@ async def find_media_storage_by_id(id: UUID, session: AsyncSession) -> MediaStor
 async def get_all_media_storage_by_entity_type(session: AsyncSession,
                                                entity_type: Optional[str]) -> MediaStorageListResponse:
     if not entity_type:
-        raise HTTPException(status_code=400, detail="Entity type cannot be null or empty.")
+        raise CustomHTTPException(status_code=400, message="Entity type cannot be null or empty.")
 
     query = (
         select(MediaStorage)
@@ -141,7 +141,27 @@ async def get_all_media_storage_by_entity_type(session: AsyncSession,
 async def delete_media_storage_by_id(id: UUID, session: AsyncSession) -> str:
     media_storage = await session.get(MediaStorage, id)
     if not media_storage:
-        raise HTTPException(status_code=404, detail="Media storage not found.")
+        raise CustomHTTPException(status_code=404, message="Media storage not found.")
     await session.delete(media_storage)
     await session.commit()
     return f"Media storage {id} deleted successfully"
+
+
+async def delete_all_media_storage(session: AsyncSession):
+    query = select(MediaStorage)
+    result = await session.execute(query)
+    media_storages = result.scalars().all()
+
+    for media_storage in media_storages:
+        # Delete the file from the filesystem
+        file_path = os.path.join("uploads", media_storage.unique_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+        # Delete the record from the database
+        await session.delete(media_storage)
+
+    await session.commit()
+    return {
+        "message": "All media storages deleted successfully"
+    }

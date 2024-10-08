@@ -1,8 +1,10 @@
 import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from app.config.custom_exceptions import ExceptionHandlerRegistry
 from app.config.swagger import custom_openapi
 from app.routes import auth
 from app.routes.backend.base_backend import backend_router
@@ -12,6 +14,9 @@ from app.routes.seeding import seed_user
 
 def create_application():
     application = FastAPI()
+
+    # Register exception handlers
+    ExceptionHandlerRegistry.register_exception_handlers(application)
 
     if not os.path.exists("uploads"):
         os.makedirs("uploads")

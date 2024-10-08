@@ -1,7 +1,8 @@
 from sqlalchemy import Column, String, DateTime
-from sqlalchemy.dialects.postgresql import UUID 
+from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 from app.models.base import BaseModel
+
 
 class MediaStorage(BaseModel):
     __tablename__ = "media_storages"

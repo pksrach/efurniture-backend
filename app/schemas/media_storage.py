@@ -1,7 +1,9 @@
-from pydantic import BaseModel
+from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from datetime import datetime
+
+from pydantic import BaseModel
+
 
 class MediaStorageCreate(BaseModel):
     name: Optional[str]
@@ -10,6 +12,7 @@ class MediaStorageCreate(BaseModel):
     uri: Optional[str]
     reference_id: Optional[UUID]
     entity_type: Optional[str]
+
 
 class MediaStorageResponseSchema(BaseModel):
     id: UUID

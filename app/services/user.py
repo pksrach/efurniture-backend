@@ -1,11 +1,11 @@
 import logging
 from datetime import datetime, timedelta
 
-from fastapi import HTTPException
 from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.config.custom_exceptions import CustomHTTPException
 from app.config.security import hash_password, is_password_long_enough, generate_token
 from app.config.settings import get_settings
 from app.models.customer import Customer
@@ -23,13 +23,13 @@ async def create_user_account(data: RegisterUserRequest, session: AsyncSession):
     try:
         # validate
         if not data.email:
-            raise HTTPException(status_code=400, detail="Email is required.")
+            raise CustomHTTPException(status_code=400, message="Email is required.")
 
         if not data.username:
-            raise HTTPException(status_code=400, detail="Username is required.")
+            raise CustomHTTPException(status_code=400, message="Username is required.")
 
         if not data.password:
-            raise HTTPException(status_code=400, detail="Password is required.")
+            raise CustomHTTPException(status_code=400, message="Password is required.")
 
         async with session.begin():
             stmt = select(User).where(or_(User.email == data.email, User.username == data.username))
@@ -37,10 +37,10 @@ async def create_user_account(data: RegisterUserRequest, session: AsyncSession):
             user_exist = result.scalars().first()
 
             if user_exist:
-                raise HTTPException(status_code=400, detail="Email or username already exists.")
+                raise CustomHTTPException(status_code=400, message="Email or username already exists.")
 
             if not is_password_long_enough(data.password):
-                raise HTTPException(status_code=400, detail="Please provide long password.")
+                raise CustomHTTPException(status_code=400, message="Please provide long password.")
 
             new_user = User(
                 username=data.username,
@@ -68,7 +68,7 @@ async def create_user_account(data: RegisterUserRequest, session: AsyncSession):
         await session.refresh(new_user)
 
         if new_user is None:
-            raise HTTPException(status_code=400, detail="User not created.")
+            raise CustomHTTPException(status_code=400, message="User not created.")
 
         access_token_expiry = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         refresh_token_expiry = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
@@ -88,7 +88,7 @@ async def create_user_account(data: RegisterUserRequest, session: AsyncSession):
     except Exception as e:
         logging.exception(e)
         await session.rollback()
-        raise HTTPException(status_code=400, detail="Invalid Request: " + str(e))
+        raise CustomHTTPException(status_code=400, message="Invalid Request: " + str(e))
 
 
 async def get_all_users(session: AsyncSession, pagination: PaginationParam):

@@ -4,13 +4,14 @@ import uuid
 from datetime import datetime, timedelta
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from app.config.custom_exceptions import CustomHTTPException
 from app.config.database import get_session
 from app.config.settings import get_settings
 from app.constants.roles import Roles
@@ -105,7 +106,7 @@ async def get_token_user(token: str, db: AsyncSession):
         try:
             # Ensure the payload contains required fields
             if 'sub' not in payload:
-                raise HTTPException(status_code=400, detail="Invalid token payload: 'sub' not found")
+                raise CustomHTTPException(status_code=400, message="Invalid token payload: 'sub' not found")
 
             # Extract the user ID from the token payload
             user_id = payload.get('sub')  # 'sub' is the user ID, assumed to be a UUID
@@ -116,15 +117,15 @@ async def get_token_user(token: str, db: AsyncSession):
             user = result.scalar()
 
             if not user:
-                raise HTTPException(status_code=404, detail="User not found")
+                raise CustomHTTPException(status_code=404, message="User not found")
 
             return user  # Return the user if found
 
         except (ValueError, TypeError) as e:
             logging.error(f"Token decoding error: {str(e)}")
-            raise HTTPException(status_code=400, detail="Invalid token payload")
+            raise CustomHTTPException(status_code=400, message="Invalid token payload")
     else:
-        raise HTTPException(status_code=400, detail="Invalid token")
+        raise CustomHTTPException(status_code=400, message="Invalid token")
 
 
 async def load_user(emailOrUsername: str, db: AsyncSession) -> User:
@@ -147,22 +148,22 @@ async def get_current_user(token: str = Depends(token_scheme), db: AsyncSession 
     if user:
         return user
 
-    raise HTTPException(status_code=401, detail="Not authorized")
+    raise CustomHTTPException(status_code=401, message="Not authorized")
 
 
 async def get_backend_user(current_user: User = Depends(get_current_user)):
     if current_user.role not in [Roles.ADMIN, Roles.USER, Roles.SUPER_ADMIN]:
-        raise HTTPException(
+        raise CustomHTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to access this route"
+            message="Not enough permissions to access this route"
         )
     return current_user
 
 
 async def get_frontend_user(current_user: User = Depends(get_current_user)):
     if current_user.role not in [Roles.CUSTOMER]:
-        raise HTTPException(
+        raise CustomHTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not enough permissions to access this route, you are not a customer"
+            message="Not enough permissions to access this route, you are not a customer"
         )
     return current_user

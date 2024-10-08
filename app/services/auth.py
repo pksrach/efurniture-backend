@@ -3,12 +3,12 @@ from datetime import timedelta, datetime
 from uuid import UUID
 
 import httpx
-from fastapi import HTTPException
 from sqlalchemy import or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from starlette.responses import JSONResponse
 
+from app.config.custom_exceptions import CustomHTTPException
 from app.config.security import generate_token, verify_password, get_token_payload, hash_password
 from app.config.settings import get_settings
 from app.constants.roles import Roles
@@ -27,10 +27,10 @@ async def auth_login(request: LoginRequest, session: AsyncSession) -> TokenRespo
         user_exist = result.scalar()
 
         if not user_exist:
-            raise HTTPException(status_code=400, detail="Email or username not found.")
+            raise CustomHTTPException(status_code=400, message="Email or username not found.")
 
         if not verify_password(request.password, user_exist.password):
-            raise HTTPException(status_code=400, detail="Invalid password.")
+            raise CustomHTTPException(status_code=400, message="Invalid password.")
 
         access_token_expiry = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         refresh_token_expiry = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
@@ -57,18 +57,18 @@ async def auth_refresh(refresh_token: str, session: AsyncSession) -> TokenRespon
     payload = get_token_payload(refresh_token, settings.JWT_SECRET, settings.JWT_ALGORITHM)
 
     if payload is None:
-        raise HTTPException(status_code=400, detail="Invalid refresh token.")
+        raise CustomHTTPException(status_code=400, message="Invalid refresh token.")
     user_id = payload.get("sub")
 
     if not user_id:
-        raise HTTPException(status_code=400, detail="Invalid refresh token.")
+        raise CustomHTTPException(status_code=400, message="Invalid refresh token.")
 
     stmt = select(User).where(User.id == user_id)
     result = await session.execute(stmt)
     user = result.scalar()
 
     if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
+        raise CustomHTTPException(status_code=404, message="User not found.")
 
     access_token_expiry = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = generate_token(user, access_token_expiry)
@@ -108,7 +108,7 @@ async def auth_forgot_password(email: str, session: AsyncSession):
     user = result.scalar()
 
     if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
+        raise CustomHTTPException(status_code=404, message="User not found.")
 
     # Generate a 6-digit reset code
     reset_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
@@ -143,22 +143,22 @@ async def auth_verify_password(req: VerifyPasswordRequest, session: AsyncSession
     user_token = result.scalar()
 
     if not user_token:
-        raise HTTPException(status_code=404, detail="Token not found.")
+        raise CustomHTTPException(status_code=404, message="Token not found.")
 
     if user_token.expires_at < datetime.now():
-        raise HTTPException(status_code=400, detail="Token expired.")
+        raise CustomHTTPException(status_code=400, message="Token expired.")
 
     # Decode the token to get the code
     payload = get_token_payload(req.token, settings.JWT_SECRET, settings.JWT_ALGORITHM)
 
     # Before get code need to check first if the payload is not None
     if payload is None:
-        raise HTTPException(status_code=400, detail="Invalid token.")
+        raise CustomHTTPException(status_code=400, message="Invalid token.")
 
     payloadCode = payload.get("dict").get("code")
 
     if req.code != payloadCode:
-        raise HTTPException(status_code=400, detail="Invalid code.")
+        raise CustomHTTPException(status_code=400, message="Invalid code.")
 
     expiry = 5  # in minutes
     access_token = generate_token(user_token, timedelta(minutes=expiry))
@@ -174,14 +174,14 @@ async def auth_verify_password(req: VerifyPasswordRequest, session: AsyncSession
 
 async def auth_reset_new_password(user_id: UUID, new_password: str, session: AsyncSession):
     if not user_id:
-        raise HTTPException(status_code=400, detail="User not found.")
+        raise CustomHTTPException(status_code=400, message="User not found.")
 
     stmt = select(User).where(User.id == user_id)
     result = await session.execute(stmt)
     user = result.scalar()
 
     if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
+        raise CustomHTTPException(status_code=404, message="User not found.")
 
     user.password = hash_password(new_password)
     await session.commit()
