@@ -1,3 +1,4 @@
+from typing import Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Request, UploadFile
@@ -30,10 +31,10 @@ async def get_media_storage(media_id, session: AsyncSession = Depends(get_sessio
 @media_router.post("", status_code=201)
 async def add_media_storage(
         file: UploadFile,
-        namespace: str | None,
-        reference_id: UUID,
         request: Request,
-        session: AsyncSession = Depends(get_session)
+        session: AsyncSession = Depends(get_session),
+        namespace: Optional[str] = None,
+        reference_id: Optional[UUID] = None,
 ):
     return await media_storage.add_media_storage(file, namespace, reference_id, request, session)
 
