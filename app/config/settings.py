@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     DATABASE_URI: str = f"postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}/{PG_DB}"
 
     # JWT Secret Key
-    JWT_SECRET: str = os.environ.get("JWT_SECRET_KEY", "649fb93ef34e4fdf4187709c84d643dd61ce730d91856418fdcf563f895ea40f")
+    JWT_SECRET: str = os.environ.get("JWT_SECRET_KEY", "your_jwt_secret_key")
     JWT_ALGORITHM: str = os.environ.get("ACCESS_TOKEN_ALGORITHM", "HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", 3))
     REFRESH_TOKEN_EXPIRE_MINUTES: int = int(os.environ.get("REFRESH_TOKEN_EXPIRE_MINUTES", 1440))
