@@ -1,24 +1,24 @@
-# Product model
-from sqlalchemy import Boolean, Column, ForeignKey, String, Float
-from app.config.database import Base
+# app/models/product.py
+from sqlalchemy import Boolean, Column, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
-import uuid
 from sqlalchemy.orm import relationship
 
-class Product(Base):
+from app.models.base import BaseModel
+from app.models.brand import Brand
+from app.models.category import Category
+
+
+class Product(BaseModel):
     __tablename__ = 'products'
-    
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
     name = Column(String, nullable=False)
     description = Column(String)
     attachment = Column(String)
     is_active = Column(Boolean, default=True)
-    
-    # Correct the ForeignKey to reference categories.category_id
-    category_id = Column(UUID(as_uuid=True), ForeignKey("categories.category_id"))  # Correct column name
-    
-    brand_id = Column(UUID(as_uuid=True), ForeignKey("brands.brand_id"))
 
-    category = relationship("Category", back_populates="products")
-    brand = relationship("Brand", back_populates="products")
-    product_prices = relationship("ProductPrice", back_populates="product")
+    category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id"))
+    brand_id = Column(UUID(as_uuid=True), ForeignKey("brands.id"))
+
+    category = relationship('Category', back_populates="products")
+    brand = relationship('Brand', back_populates="products")
+    product_prices = relationship("ProductPrice", back_populates="product", cascade="all, delete-orphan")

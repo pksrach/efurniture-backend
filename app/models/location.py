@@ -1,14 +1,18 @@
-from sqlalchemy import Column, ForeignKey, String,Float
-from app.config.database import Base
+from sqlalchemy import Column, ForeignKey, Numeric, String, Float
 from sqlalchemy.dialects.postgresql import UUID
-import uuid
 from sqlalchemy.orm import relationship
 
-class Location(Base):
+from app.models.base import BaseModel
+
+
+class Location(BaseModel):
     __tablename__ = "locations"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+
     name = Column(String, nullable=False)
-    price = Column(Float)
+    price = Column(Numeric(10, 2))  # Changed Float to Numeric for precision
     parent_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"))
 
-    children = relationship("Location")
+    # Define the children relationship (one-to-many)
+    children = relationship("Location", backref="parent", remote_side="Location.id")
+
+    orders = relationship("Order", back_populates="location")

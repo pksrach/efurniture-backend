@@ -1,12 +1,14 @@
-from sqlalchemy import Column, Date, ForeignKey, String,Float
-from app.config.database import Base
+from sqlalchemy import Column, Date, ForeignKey, String, Float
 from sqlalchemy.dialects.postgresql import UUID
-import uuid
 from sqlalchemy.orm import relationship
+from app.models.base import BaseModel
+from app.models.location import Location  # Ensure Location is imported
+from app.models.payment_method import PaymentMethod  # Ensure PaymentMethod is imported
+from app.models.order_detail import OrderDetail  # Ensure OrderDetail is imported
 
-class Order(Base):
+
+class Order(BaseModel):
     __tablename__ = "orders"
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     order_date = Column(Date, nullable=False)
     customer_id = Column(UUID(as_uuid=True), ForeignKey("customers.id"))
     location_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"))
@@ -21,7 +23,7 @@ class Order(Base):
     staff_id = Column(UUID(as_uuid=True), ForeignKey("staffs.id"))
 
     customer = relationship("Customer", back_populates="orders")
-    location = relationship("Location")
+    location = relationship("Location", back_populates="orders")
     payment_method = relationship("PaymentMethod", back_populates="orders")
-    staffs = relationship("Staff", back_populates="orders")
+    staff = relationship("Staff", back_populates="orders")
     order_details = relationship("OrderDetail", back_populates="order")

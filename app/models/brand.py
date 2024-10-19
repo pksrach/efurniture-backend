@@ -1,13 +1,15 @@
-from sqlalchemy import Column,String, Text
-from app.config.database import Base
-from sqlalchemy.dialects.postgresql import UUID
-import uuid
+from sqlalchemy import Column, String, Text
+from sqlalchemy.orm import relationship
 
-class Brand(Base):
+from app.models.base import BaseModel
+
+
+class Brand(BaseModel):
     __tablename__ = 'brands'
 
-    brand_id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    code = Column(String(100), nullable=False)
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False, unique=True)
     description = Column(Text, nullable=True)
-    attachment = Column(String)
+    attachment = Column(String, nullable=True)
+
+    # Define the relationship to Product
+    products = relationship("Product", back_populates="brand")
