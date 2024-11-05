@@ -29,6 +29,7 @@ def custom_openapi(app: FastAPI):
         # Frontend-related tag
         {"name": "Frontend Profile API", "description": "Endpoints used for profile frontend operations and interactions."},
         {"name": "Frontend Product API", "description": "Endpoints used for product frontend operations and interactions."},
+        {"name": "Frontend Category API", "description": "Endpoints used for category frontend operations and interactions."},
 
         # Default tag
         {"name": "Default", "description": "Default operations provided by the system."},

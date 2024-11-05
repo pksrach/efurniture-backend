@@ -12,5 +12,5 @@ frontend_product_router = APIRouter(
 
 
 @frontend_product_router.get("", status_code=200)
-async def products(session: AsyncSession = Depends(get_session), pagination: PaginationParam = Depends(PaginationParam)):
+async def get_products(session: AsyncSession = Depends(get_session), pagination: PaginationParam = Depends(PaginationParam)):
     return await product.get_products(session, pagination)
