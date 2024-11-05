@@ -1,11 +1,12 @@
 from fastapi import APIRouter
 
-product_router = APIRouter(
-    prefix="/products"
+frontend_product_router = APIRouter(
+    prefix="/products",
+    tags=["Frontend Product API"],
 )
 
 
-@product_router.get("", status_code=200, response_model=list)
+@frontend_product_router.get("", status_code=200)
 async def get_products():
     return [
         {"name": "Product 1", "price": 100},
