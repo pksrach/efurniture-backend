@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from app.config.security import get_frontend_user
 from app.routes.frontend.frontend_product import frontend_product_router
 from app.routes.frontend.frontend_user_profile import frontend_profile_router
 
@@ -10,4 +9,4 @@ frontend_router = APIRouter(
 )
 
 frontend_router.include_router(frontend_profile_router, tags=["Frontend Profile API"])
-frontend_router.include_router(frontend_product_router, tags=["Frontend Product API"], dependencies=[])
+frontend_router.include_router(frontend_product_router, tags=["Frontend Product API"])
