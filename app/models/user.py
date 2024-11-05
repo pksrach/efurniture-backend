@@ -15,6 +15,7 @@ class User(BaseModel):
     tokens = relationship("UserToken", back_populates="user")
     customer = relationship("Customer", back_populates="user", uselist=False)
     staff = relationship("Staff", back_populates="user", uselist=False)
+    carts = relationship("Cart", back_populates="user")
 
     def get_context_string(self, context: str) -> str:
         updated_at_str = self.updated_at.strftime('%m%d%Y%H%M%S') if self.updated_at else ''

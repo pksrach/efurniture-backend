@@ -31,6 +31,8 @@ def custom_openapi(app: FastAPI):
         {"name": "Frontend Product API", "description": "Endpoints used for product frontend operations and interactions."},
         {"name": "Frontend Category API", "description": "Endpoints used for category frontend operations and interactions."},
         {"name": "Frontend Brand API", "description": "Endpoints used for brand frontend operations and interactions."},
+        {"name": "Frontend Color API", "description": "Endpoints used for color frontend operations and interactions."},
+        {"name": "Frontend Cart API", "description": "Endpoints used for cart frontend operations and interactions."},
 
         # Default tag
         {"name": "Default", "description": "Default operations provided by the system."},
