@@ -15,11 +15,12 @@ class Settings(BaseSettings):
     DEBUG: bool = bool(os.environ.get("DEBUG", False))
 
     # Postgresql Database Config
+    PG_PORT: str = os.environ.get("POSTGRES_PORT", "5432")
     PG_HOST: str = os.environ.get("POSTGRES_HOST")
     PG_USER: str = os.environ.get("POSTGRES_USER")
     PG_PASSWORD: str = os.environ.get("POSTGRES_PASSWORD")
     PG_DB: str = os.environ.get("POSTGRES_DATABASE")
-    DATABASE_URI: str = f"postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}/{PG_DB}"
+    DATABASE_URI: str = f"postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
 
     # JWT Secret Key
     JWT_SECRET: str = os.environ.get("JWT_SECRET_KEY", "your_jwt_secret_key")
