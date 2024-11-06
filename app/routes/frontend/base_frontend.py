@@ -1,15 +1,20 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 
-from app.config.security import get_frontend_user
-from app.routes.frontend.product import product_router
-from app.routes.frontend.user import user_router
+from app.routes.frontend.frontend_brand_router import frontend_brand_router
+from app.routes.frontend.frontend_cart_router import frontend_cart_router
+from app.routes.frontend.frontend_category_router import frontend_category_router
+from app.routes.frontend.frontend_color_router import frontend_color_router
+from app.routes.frontend.frontend_product_router import frontend_product_router
+from app.routes.frontend.frontend_user_profile_router import frontend_profile_router
 
 frontend_router = APIRouter(
     prefix="/frontend",
-    tags=["Frontend API"],
     responses={404: {"description": "Not Found!"}},
-    dependencies=[Depends(get_frontend_user)]
 )
 
-frontend_router.include_router(user_router)
-frontend_router.include_router(product_router)
+frontend_router.include_router(frontend_profile_router, tags=["Frontend Profile API"])
+frontend_router.include_router(frontend_product_router, tags=["Frontend Product API"])
+frontend_router.include_router(frontend_category_router, tags=["Frontend Category API"])
+frontend_router.include_router(frontend_brand_router, tags=["Frontend Brand API"])
+frontend_router.include_router(frontend_color_router, tags=["Frontend Color API"])
+frontend_router.include_router(frontend_cart_router, tags=["Frontend Cart API"])

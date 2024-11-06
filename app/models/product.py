@@ -1,11 +1,8 @@
-# app/models/product.py
 from sqlalchemy import Boolean, Column, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.models.base import BaseModel
-from app.models.brand import Brand
-from app.models.category import Category
 
 
 class Product(BaseModel):

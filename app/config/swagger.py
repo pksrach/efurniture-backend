@@ -14,6 +14,7 @@ def custom_openapi(app: FastAPI):
     openapi_schema["tags"] = [
         {"name": "Auth API", "description": "Authentication and authorization operations."},
 
+        # Backend-related tags
         {"name": "Backend Color API", "description": "Endpoints for managing color-related data in the backend."},
         {"name": "Backend Category API", "description": "Endpoints for managing categories in the backend."},
         {"name": "Backend Brand API", "description": "Endpoints for managing brands in the backend."},
@@ -25,7 +26,15 @@ def custom_openapi(app: FastAPI):
         {"name": "Backend Location API", "description": "Endpoints for managing location information in the backend."},
         {"name": "Backend Media Storage API", "description": "Endpoints for managing media storage information in the backend."},
 
-        {"name": "Frontend API", "description": "Endpoints used for frontend operations and interactions."},
+        # Frontend-related tag
+        {"name": "Frontend Profile API", "description": "Endpoints used for profile frontend operations and interactions."},
+        {"name": "Frontend Product API", "description": "Endpoints used for product frontend operations and interactions."},
+        {"name": "Frontend Category API", "description": "Endpoints used for category frontend operations and interactions."},
+        {"name": "Frontend Brand API", "description": "Endpoints used for brand frontend operations and interactions."},
+        {"name": "Frontend Color API", "description": "Endpoints used for color frontend operations and interactions."},
+        {"name": "Frontend Cart API", "description": "Endpoints used for cart frontend operations and interactions."},
+
+        # Default tag
         {"name": "Default", "description": "Default operations provided by the system."},
     ]
 
