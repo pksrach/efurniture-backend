@@ -33,13 +33,19 @@ async def get_carts(user, session: AsyncSession):
 
         if not carts:
             logger.info("No carts found")
-            return []
+            return FrontendCartResponse(
+                data=None,
+                message="No carts found"
+            )
 
         return FrontendCartListResponse.from_entity(carts)
 
     except SQLAlchemyError as e:
         logger.error(f"Error fetching carts: {e}")
-        return []
+        return FrontendCartResponse(
+            data=None,
+            message="Error fetching carts"
+        )
 
 
 async def add_cart(req: CartRequest, user, session: AsyncSession):
@@ -123,7 +129,10 @@ async def add_cart(req: CartRequest, user, session: AsyncSession):
     except SQLAlchemyError as e:
         logger.error(f"Error adding cart: {e}")
         await session.rollback()
-        return None
+        return FrontendCartResponse(
+            data=None,
+            message="Error adding cart"
+        )
     except ValueError as e:
         logger.error(e)
         raise ValueError(e)
