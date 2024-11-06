@@ -14,4 +14,4 @@ class BaseModel(Base):
     created_by = Column(UUID(as_uuid=True), nullable=True)
     updated_at = Column(DateTime, nullable=True, onupdate=func.now())
     updated_by = Column(UUID(as_uuid=True), nullable=True)
-    deleted_at = Column(DateTime, nullable=True, onupdate=func.now())
+    deleted_at = Column(DateTime, nullable=True)

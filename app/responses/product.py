@@ -3,32 +3,9 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from app.models.product import Product
-from app.models.product_price import ProductPrice
 from app.responses.base import BaseResponse
-
-
-class KeyValueResponse(BaseModel):
-    key: str | UUID | None
-    value: str | None
-
-
-class ProductPriceDataResponse(BaseModel):
-    id: str | UUID
-    color: KeyValueResponse | None
-    size: str | None
-    price: float
-
-    @classmethod
-    def from_entity(cls, product_price: 'ProductPrice') -> 'ProductPriceDataResponse':
-        return cls(
-            id=product_price.id,
-            color=KeyValueResponse(
-                key=str(product_price.color_id),
-                value=product_price.color.name
-            ) if product_price.color else None,
-            size=product_price.size,
-            price=product_price.price,
-        )
+from app.responses.key_value_response import KeyValueResponse
+from app.responses.product_price_response import ProductPriceDataResponse
 
 
 class ProductDataResponse(BaseModel):
@@ -82,4 +59,30 @@ class ProductListResponse(BaseResponse):
         return cls(
             data=[ProductDataResponse.from_entity(product) for product in products],
             message="Products fetched successfully"
+        )
+
+
+class ProductResponseWithoutProductPrice(BaseResponse):
+    data: ProductDataResponse | None
+
+    @classmethod
+    def from_entity(cls, product: 'Product') -> 'ProductResponseWithoutProductPrice':
+        return cls(
+            data=ProductDataResponse(
+                id=product.id,
+                name=product.name,
+                description=product.description,
+                attachment=product.attachment,
+                category=KeyValueResponse(
+                    key=str(product.category_id),
+                    value=product.category.name
+                ) if product.category else None,
+                brand=KeyValueResponse(
+                    key=str(product.brand_id),
+                    value=product.brand.name
+                ) if product.brand else None,
+                product_prices=None,
+                is_active=product.is_active,
+            ),
+            message="Product fetched successfully"
         )
