@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Define environment variables
-POSTGRES_HOST="aws-0-ap-southeast-1.pooler.supabase.com"
+POSTGRES_HOST="your_host"
 POSTGRES_PORT="5432"
-POSTGRES_USER="postgres.mhnvrxswesrjuhdysdtu"
-POSTGRES_PASSWORD="2NnEhm8dY2NR47_"
+POSTGRES_USER="your_usename"
+POSTGRES_PASSWORD="your_password"
 POSTGRES_DATABASE="efurniture"
 
 CONTAINER=efurniture-backend
