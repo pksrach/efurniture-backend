@@ -20,8 +20,17 @@ COPY .env .
 COPY alembic.ini .
 COPY alembic alembic
 
+# Copy the Alembic runner script into the container
+COPY run_alembic.sh .
+
+# Make the script executable
+RUN chmod +x run_alembic.sh
+
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
+
+# Set the ENTRYPOINT to run the Alembic migrations
+#ENTRYPOINT ["./run_alembic.sh"]
 
 # Run the FastAPI server
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
