@@ -1,4 +1,4 @@
-# app/services/seeding/seed_user.py
+# app/services/seeding/seed_data.py
 
 from datetime import datetime
 

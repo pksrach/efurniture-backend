@@ -9,7 +9,7 @@ from app.config.swagger import custom_openapi
 from app.routes import auth
 from app.routes.backend.base_backend import backend_router
 from app.routes.frontend.base_frontend import frontend_router
-from app.routes.seeding.seed_user import seed_router
+from app.routes.seeding.seed_data import seed_router
 
 
 def create_application():
