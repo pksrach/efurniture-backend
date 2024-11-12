@@ -13,8 +13,6 @@ class Order(BaseModel):
     customer_id = Column(UUID(as_uuid=True), ForeignKey("customers.id"))
     location_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"))
     location_price = Column(Float)
-    total = Column(Float)
-    discount = Column(Float, default=0)
     amount = Column(Float)
     payment_method_id = Column(UUID(as_uuid=True), ForeignKey("payment_methods.id"))
     payment_attachment = Column(String)

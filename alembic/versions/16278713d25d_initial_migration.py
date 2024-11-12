@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 7a5e3b44dde5
+Revision ID: 16278713d25d
 Revises: 
-Create Date: 2024-11-11 23:10:01.140340
+Create Date: 2024-11-13 01:01:09.149793
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7a5e3b44dde5'
+revision: str = '16278713d25d'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -202,8 +202,6 @@ def upgrade() -> None:
     sa.Column('customer_id', sa.UUID(), nullable=True),
     sa.Column('location_id', sa.UUID(), nullable=True),
     sa.Column('location_price', sa.Float(), nullable=True),
-    sa.Column('total', sa.Float(), nullable=True),
-    sa.Column('discount', sa.Float(), nullable=True),
     sa.Column('amount', sa.Float(), nullable=True),
     sa.Column('payment_method_id', sa.UUID(), nullable=True),
     sa.Column('payment_attachment', sa.String(), nullable=True),
@@ -276,8 +274,6 @@ def upgrade() -> None:
     sa.Column('price', sa.Float(), nullable=True),
     sa.Column('qty', sa.Integer(), nullable=True),
     sa.Column('total', sa.Float(), nullable=True),
-    sa.Column('discount', sa.Float(), nullable=True),
-    sa.Column('amount', sa.Float(), nullable=True),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('created_by', sa.UUID(), nullable=True),

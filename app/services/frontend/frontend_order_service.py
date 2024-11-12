@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
@@ -8,6 +9,8 @@ from app.models.customer import Customer
 from app.models.order import Order
 from app.models.order_detail import OrderDetail
 from app.schemas.order import OrderRequest
+from app.services.frontend import frontend_cart_service
+from app.services.location import get_location
 
 logger = logging.getLogger(__name__)
 
@@ -29,16 +32,19 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
         print("customer_id ", customer.id)
         customer_id = customer.id
 
+        # Assign location price
+        location = await get_location(req.location_id, session)
+        if location.data is None:
+            raise ValueError("Location not found")
+
         # Create the order
         new_order = Order(
-            order_date=req.order_date,
+            order_date=datetime.now(),
             order_status='pending',
-            total=0,
-            discount=0,
             amount=0,
             customer_id=customer_id,
-            location_id=req.location_id,
-            location_price=0,
+            location_id=location.data.id,
+            location_price=location.data.price,
             payment_method_id=req.payment_method_id,
             payment_attachment=req.payment_attachment,
             note=req.note,
@@ -46,8 +52,6 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
         )
         session.add(new_order)
         await session.flush()  # Ensure new_order.id is available
-
-        print("new_order.id: ", new_order.id)
 
         # Create order details
         for detail in req.details:
@@ -64,15 +68,15 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
                 total=detail.price * detail.qty,
                 created_by=user.id
             )
-            # Calculate amount
+            # Calculate order amount
             new_order.amount += new_order_detail.total
-
             session.add(new_order_detail)
-
-        print("new_order.amount: ", new_order.amount)
 
         await session.commit()
         await session.refresh(new_order)
+
+        # Clear cart
+        await frontend_cart_service.remove_all_carts(user, session)
 
         logger.info("Order created successfully")
         return new_order

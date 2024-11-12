@@ -3,11 +3,6 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from app.models.base import BaseModel
-from app.models.product_price import ProductPrice # Ensure ProductPrice is imported
-from app.models.product import Product
-from app.models.category import Category
-from app.models.brand import Brand
-from app.models.color import Color
 
 
 class OrderDetail(BaseModel):
@@ -23,8 +18,6 @@ class OrderDetail(BaseModel):
     price = Column(Float)
     qty = Column(Integer)
     total = Column(Float)
-    discount = Column(Float, default=0)
-    amount = Column(Float)
 
     order = relationship("Order", back_populates="order_details")
     product_price = relationship("ProductPrice", back_populates="order_details")
