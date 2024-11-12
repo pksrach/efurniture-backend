@@ -21,7 +21,7 @@ async def _get_location_by_id(id: str, session: AsyncSession) -> Optional[Locati
 
 
 async def get_locations(session: AsyncSession, pagination: PaginationParam):
-    stmt = select(Location).options(joinedload(Location.parent)).order_by(Location.created_at)
+    stmt = select(Location).options(joinedload(Location.children)).order_by(Location.created_at)
 
     return await fetch_paginated_data(
         session=session,

@@ -14,5 +14,5 @@ frontend_order_router = APIRouter(
 
 
 @frontend_order_router.post("", status_code=201)
-async def create_order(req: OrderRequest, user=Depends(get_current_user), session: AsyncSession = Depends(get_session)):
+async def checkout_order(req: OrderRequest, user=Depends(get_current_user), session: AsyncSession = Depends(get_session)):
     return await order.create_order(req, user, session)
