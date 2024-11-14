@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 from alembic import context
 
 # Import All Models
+from app.models.order_history import *
 from app.models.cart import *
 from app.models.category import *
 from app.models.brand import *

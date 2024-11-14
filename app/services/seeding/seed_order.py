@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,44 +14,48 @@ class SeedOrder:
         self.session = session
 
     async def seed_order_from_carts(self):
-        # Fetch cart data
-        cart_response = await get_carts(self.user, self.session)
-        if not cart_response.data:
-            return ValueError("No carts found")
+        try:
+            # Fetch cart data
+            cart_response = await get_carts(self.user, self.session)
+            if not cart_response.data:
+                raise ValueError("No carts found")
 
-        print("cart_response.data: ", cart_response.data)
+            print("cart_response.data: ", cart_response.data)
 
-        # Create order details from cart data
-        order_details = []
-        for cart in cart_response.data:
-            order_details.append(OrderDetailRequest(
-                product_id=cart.product_id,
-                product_price_id=cart.product_price_id,
-                category_id=cart.category.key,
-                brand_id=cart.brand.key,
-                color_id=cart.color.key,
-                size=cart.size,
-                price=cart.price,
-                qty=cart.qty
-            ))
+            # Create order details from cart data
+            order_details = []
+            for cart in cart_response.data:
+                order_details.append(OrderDetailRequest(
+                    product_id=cart.product_id,
+                    category_id=cart.category.key,
+                    brand_id=cart.brand.key,
+                    color_id=cart.color.key,
+                    size=cart.size,
+                    price=cart.price,
+                    qty=cart.qty
+                ))
 
-        # Fetch a random payment method
-        payment_method = await self.get_payment_method()
+            # Fetch a random payment method
+            payment_method = await self.get_payment_method()
 
-        location = await self.get_location()
+            location = await self.get_location()
 
-        # Create order request
-        order_request = OrderRequest(
-            order_date=datetime.now(),
-            location_id=location.id,
-            payment_method_id=payment_method.id,
-            payment_attachment=payment_method.attachment_qr,
-            note="Seed order",
-            details=order_details
-        )
+            # Create order request
+            order_request = OrderRequest(
+                location_id=location.id,
+                payment_method_id=payment_method.id,
+                payment_attachment=payment_method.attachment_qr,
+                note="Seed order",
+                details=order_details
+            )
 
-        # Create order
-        return await create_order(order_request, self.user, self.session)
+            # Create order
+            return await create_order(order_request, self.user, self.session)
+
+        except ValueError as e:
+            return {
+                "message": "An error occurred while seeding order",
+                "error": str(e)}
 
     async def get_location(self):
         stmt = select(Location).order_by(func.random()).limit(1)

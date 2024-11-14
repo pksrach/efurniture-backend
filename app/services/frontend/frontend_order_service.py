@@ -11,6 +11,7 @@ from app.models.order_detail import OrderDetail
 from app.schemas.order import OrderRequest
 from app.services.frontend import frontend_cart_service
 from app.services.location import get_location
+from app.services.order_history import create_order_history
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,6 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
     print("Creating order...")
     try:
         # Fetch customer id from user
-        print("user_id: ", user.id)
         stmt = (
             select(Customer)
             .where(Customer.user_id == user.id)
@@ -29,7 +29,6 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
 
         if customer is None:
             raise ValueError("Customer not found")
-        print("customer_id ", customer.id)
         customer_id = customer.id
 
         # Assign location price
@@ -51,6 +50,7 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
             created_by=user.id
         )
         session.add(new_order)
+
         await session.flush()  # Ensure new_order.id is available
 
         # Create order details
@@ -71,6 +71,9 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
             new_order.amount += new_order_detail.total
             session.add(new_order_detail)
 
+        # Add order history
+        await create_order_history(user.id, new_order.id, new_order.order_status, session)
+
         await session.commit()
         await session.refresh(new_order)
 
@@ -83,7 +86,7 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
     except SQLAlchemyError as e:
         logger.error(f"Error creating order: {e}")
         await session.rollback()
-        return {"message": "Error creating order"}
+        return {"message": "Error creating order", "error": str(e)}
     except ValueError as e:
         logger.error(e)
         raise ValueError(e)

@@ -25,3 +25,4 @@ class Order(BaseModel):
     payment_method = relationship("PaymentMethod", back_populates="orders")
     staff = relationship("Staff", back_populates="orders")
     order_details = relationship("OrderDetail", back_populates="order", lazy='select')
+    order_histories = relationship("OrderHistory", back_populates="order", lazy='select')
