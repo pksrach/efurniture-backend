@@ -13,8 +13,8 @@ from app.services.base_service import fetch_paginated_data
 logger = logging.getLogger(__name__)
 
 
-async def _get_payment_method_by_id(id: str, session: AsyncSession) -> Optional[PaymentMethod]:
-    stmt = select(PaymentMethod).where(PaymentMethod.id == id)
+async def _get_payment_method_by_id(payment_method_id: str, session: AsyncSession) -> Optional[PaymentMethod]:
+    stmt = select(PaymentMethod).where(PaymentMethod.id == payment_method_id)
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
 
@@ -30,11 +30,11 @@ async def get_payment_methods(session: AsyncSession, pagination: PaginationParam
     )
 
 
-async def get_payment_method(id: str, session: AsyncSession) -> PaymentMethodResponse:
-    payment_method = await _get_payment_method_by_id(id, session)
+async def get_payment_method(payment_method_id: str, session: AsyncSession) -> PaymentMethodResponse:
+    payment_method = await _get_payment_method_by_id(payment_method_id, session)
 
     if payment_method is None:
-        logger.warning(f"Payment method with ID {id} not found.")
+        logger.warning(f"Payment method with ID {payment_method_id} not found.")
         return PaymentMethodResponse(
             data=None,
             message="Payment method not found"
@@ -74,12 +74,12 @@ async def create_payment_method(req: PaymentMethodRequest, session: AsyncSession
         )
 
 
-async def update_payment_method(id: str, req: PaymentMethodRequest, session: AsyncSession) -> PaymentMethodResponse:
+async def update_payment_method(payment_method_id: str, req: PaymentMethodRequest, session: AsyncSession) -> PaymentMethodResponse:
     """Update a payment method by ID with the provided data."""
-    payment_method = await _get_payment_method_by_id(id, session)
+    payment_method = await _get_payment_method_by_id(payment_method_id, session)
 
     if payment_method is None:
-        logger.warning(f"Payment method with ID {id} not found.")
+        logger.warning(f"Payment method with ID {payment_method_id} not found.")
         return PaymentMethodResponse(
             data=None,
             message="Payment method not found"
@@ -92,22 +92,22 @@ async def update_payment_method(id: str, req: PaymentMethodRequest, session: Asy
     try:
         await session.commit()
         await session.refresh(payment_method)
-        logger.info(f"Payment method with ID {id} updated successfully.")
+        logger.info(f"Payment method with ID {payment_method_id} updated successfully.")
         return PaymentMethodResponse(
             data=PaymentMethodDataResponse.from_entity(payment_method),
             message="Payment method updated successfully"
         )
     except IntegrityError as e:
         await session.rollback()
-        logger.error(f"Integrity error during update of payment method {id}: {str(e)}")
+        logger.error(f"Integrity error during update of payment method {payment_method_id}: {str(e)}")
         return PaymentMethodResponse(
             data=None,
             message="Failed to update payment method due to database integrity error."
         )
 
 
-async def delete_payment_method(id: str, session: AsyncSession) -> PaymentMethodResponse:
-    stmt = select(PaymentMethod).where(PaymentMethod.id == id)
+async def delete_payment_method(payment_method_id: str, session: AsyncSession) -> PaymentMethodResponse:
+    stmt = select(PaymentMethod).where(PaymentMethod.id == payment_method_id)
     result = await session.execute(stmt)
     payment_method = result.scalar()
 

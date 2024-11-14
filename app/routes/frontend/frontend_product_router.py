@@ -16,6 +16,6 @@ async def get_products(session: AsyncSession = Depends(get_session), pagination:
     return await product.get_products(session, pagination)
 
 
-@frontend_product_router.get("/id", status_code=200)
+@frontend_product_router.get("/{product_id}", status_code=200)
 async def get_product(product_id, session: AsyncSession = Depends(get_session)):
     return await product.get_product(product_id, session)

@@ -30,8 +30,8 @@ async def get_all_media_storage(session: AsyncSession, pagination: PaginationPar
     )
 
 
-async def get_media_storage(id: str, session: AsyncSession) -> MediaStorageResponse:
-    media_storage = await session.get(MediaStorage, id)
+async def get_media_storage(media_storage_id: str, session: AsyncSession) -> MediaStorageResponse:
+    media_storage = await session.get(MediaStorage, media_storage_id)
     if not media_storage:
         raise CustomHTTPException(status_code=404, message="Media storage not found.")
     return MediaStorageResponse.from_entity(media_storage)
@@ -116,8 +116,8 @@ async def get_media_storage_by_ref_id(session: AsyncSession, reference_id: UUID,
     return media_storage
 
 
-async def find_media_storage_by_id(id: UUID, session: AsyncSession) -> MediaStorageResponse:
-    return await session.get(MediaStorage, id)
+async def find_media_storage_by_id(media_storage_id: UUID, session: AsyncSession) -> MediaStorageResponse:
+    return await session.get(MediaStorage, media_storage_id)
 
 
 async def get_all_media_storage_by_entity_type(session: AsyncSession,
@@ -138,13 +138,13 @@ async def get_all_media_storage_by_entity_type(session: AsyncSession,
     return media_storages
 
 
-async def delete_media_storage_by_id(id: UUID, session: AsyncSession) -> str:
-    media_storage = await session.get(MediaStorage, id)
+async def delete_media_storage_by_id(media_storage_id: UUID, session: AsyncSession) -> str:
+    media_storage = await session.get(MediaStorage, media_storage_id)
     if not media_storage:
         raise CustomHTTPException(status_code=404, message="Media storage not found.")
     await session.delete(media_storage)
     await session.commit()
-    return f"Media storage {id} deleted successfully"
+    return f"Media storage {media_storage_id} deleted successfully"
 
 
 async def delete_all_media_storage(session: AsyncSession):

@@ -11,9 +11,9 @@ class ProductPriceRequest(BaseModel):
 
 
 class ProductRequest(BaseModel):
-    name: str = Field(default="Table Set")
+    name: str | UUID = Field(default="Table Set")
     description: str = None
     attachment: Optional[str] = None
-    category_id: UUID
-    brand_id: UUID
+    category_id: UUID | str
+    brand_id: UUID | str
     product_prices: list[ProductPriceRequest] = None

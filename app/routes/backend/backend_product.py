@@ -18,9 +18,9 @@ async def get_products(session: AsyncSession = Depends(get_session), pagination:
     return await product.get_products(session, pagination)
 
 
-@product_router.get("/{id}", status_code=200)
-async def get_product(id: str, session: AsyncSession = Depends(get_session)):
-    return await product.get_product(id, session)
+@product_router.get("/{product_id}", status_code=200)
+async def get_product(product_id: str, session: AsyncSession = Depends(get_session)):
+    return await product.get_product(product_id, session)
 
 
 @product_router.post("", status_code=201)
@@ -28,11 +28,11 @@ async def create_product(req: ProductRequest, session: AsyncSession = Depends(ge
     return await product.create_product(req, session)
 
 
-@product_router.put("/{id}", status_code=200)
-async def update_color(id: str, req: ProductRequest, session: AsyncSession = Depends(get_session)):
-    return await product.update_product(id, req, session)
+@product_router.put("/{product_id}", status_code=200)
+async def update_color(product_id: str, req: ProductRequest, session: AsyncSession = Depends(get_session)):
+    return await product.update_product(product_id, req, session)
 
 
-@product_router.delete("/{id}", status_code=200)
-async def delete_color(id: str, session: AsyncSession = Depends(get_session)):
-    return await product.delete_product(id, session)
+@product_router.delete("/{product_id}", status_code=200)
+async def delete_color(product_id: str, session: AsyncSession = Depends(get_session)):
+    return await product.delete_product(product_id, session)

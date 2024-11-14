@@ -20,7 +20,7 @@ async def get_orders(session: AsyncSession = Depends(get_session),
     return await order.get_orders(session, pagination)
 
 
-@order_router.get("/{id}", status_code=200)
+@order_router.get("/{order_id}", status_code=200)
 async def get_order(order_id: str, session: AsyncSession = Depends(get_session)):
     return await order.get_order(order_id, session)
 

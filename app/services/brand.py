@@ -19,8 +19,8 @@ async def get_brands(session: AsyncSession, pagination: PaginationParam):
     )
 
 
-async def get_brand(id: str, session: AsyncSession) -> BrandResponse:
-    stmt = select(Brand).where(Brand.id == id)
+async def get_brand(brand_id: str, session: AsyncSession) -> BrandResponse:
+    stmt = select(Brand).where(Brand.id == brand_id)
     result = await session.execute(stmt)
     brand = result.scalars().first()
 
@@ -57,8 +57,8 @@ async def create_brand(req: BrandRequest, session: AsyncSession) -> BrandRespons
     )
 
 
-async def update_brand(id: str, req: BrandRequest, session: AsyncSession) -> BrandResponse:
-    stmt = select(Brand).where(Brand.id == id)
+async def update_brand(brand_id: str, req: BrandRequest, session: AsyncSession) -> BrandResponse:
+    stmt = select(Brand).where(Brand.id == brand_id)
     result = await session.execute(stmt)
     brand = result.scalars().first()
 
@@ -78,8 +78,8 @@ async def update_brand(id: str, req: BrandRequest, session: AsyncSession) -> Bra
     )
 
 
-async def delete_brand(id: str, session: AsyncSession) -> BrandResponse:
-    stmt = select(Brand).where(Brand.id == id)
+async def delete_brand(brand_id: str, session: AsyncSession) -> BrandResponse:
+    stmt = select(Brand).where(Brand.id == brand_id)
     result = await session.execute(stmt)
     brand = result.scalars().first()
 

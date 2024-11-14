@@ -19,8 +19,8 @@ async def get_colors(session: AsyncSession, pagination: PaginationParam):
     )
 
 
-async def get_color(id: str, session: AsyncSession) -> ColorResponse:
-    stmt = select(Color).where(Color.id == id)
+async def get_color(color_id: str, session: AsyncSession) -> ColorResponse:
+    stmt = select(Color).where(Color.id == color_id)
     result = await session.execute(stmt)
     color = result.scalar()
 
@@ -57,8 +57,8 @@ async def create_color(req: ColorRequest, session: AsyncSession) -> ColorRespons
     )
 
 
-async def update_color(id: str, req: ColorRequest, session: AsyncSession) -> ColorResponse:
-    stmt = select(Color).where(Color.id == id)
+async def update_color(color_id: str, req: ColorRequest, session: AsyncSession) -> ColorResponse:
+    stmt = select(Color).where(Color.id == color_id)
     result = await session.execute(stmt)
     color = result.scalars().first()
 
@@ -78,8 +78,8 @@ async def update_color(id: str, req: ColorRequest, session: AsyncSession) -> Col
     )
 
 
-async def delete_color(id: str, session: AsyncSession) -> ColorResponse:
-    stmt = select(Color).where(Color.id == id)
+async def delete_color(color_id: str, session: AsyncSession) -> ColorResponse:
+    stmt = select(Color).where(Color.id == color_id)
     result = await session.execute(stmt)
     color = result.scalars().first()
 

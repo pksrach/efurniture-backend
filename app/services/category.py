@@ -19,8 +19,8 @@ async def get_categories(session: AsyncSession, pagination: PaginationParam):
     )
 
 
-async def get_category(id: str, session: AsyncSession) -> CategoryResponse:
-    stmt = select(Category).where(Category.id == id)
+async def get_category(category_id: str, session: AsyncSession) -> CategoryResponse:
+    stmt = select(Category).where(Category.id == category_id)
     result = await session.execute(stmt)
     category = result.scalars().first()
 
@@ -57,8 +57,8 @@ async def create_category(req: CategoryRequest, session: AsyncSession) -> Catego
     )
 
 
-async def update_category(id: str, req: CategoryRequest, session: AsyncSession) -> CategoryResponse:
-    stmt = select(Category).where(Category.id == id)
+async def update_category(category_id: str, req: CategoryRequest, session: AsyncSession) -> CategoryResponse:
+    stmt = select(Category).where(Category.id == category_id)
     result = await session.execute(stmt)
     category = result.scalars().first()
 
@@ -78,8 +78,8 @@ async def update_category(id: str, req: CategoryRequest, session: AsyncSession) 
     )
 
 
-async def delete_category(id: str, session: AsyncSession) -> CategoryResponse:
-    stmt = select(Category).where(Category.id == id)
+async def delete_category(category_id: str, session: AsyncSession) -> CategoryResponse:
+    stmt = select(Category).where(Category.id == category_id)
     result = await session.execute(stmt)
     category = result.scalars().first()
 
