@@ -18,3 +18,13 @@ order_router = APIRouter(
 async def get_orders(session: AsyncSession = Depends(get_session),
                      pagination: PaginationParam = Depends(PaginationParam)):
     return await order.get_orders(session, pagination)
+
+
+@order_router.get("/{id}", status_code=200)
+async def get_order(order_id: str, session: AsyncSession = Depends(get_session)):
+    return await order.get_order(order_id, session)
+
+
+@order_router.get("/details/{order_id}", status_code=200)
+async def get_order_details(order_id: str, session: AsyncSession = Depends(get_session)):
+    return await order.get_order_details(order_id, session)

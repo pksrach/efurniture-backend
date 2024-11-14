@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
@@ -7,7 +6,6 @@ from pydantic import BaseModel
 
 class OrderDetailRequest(BaseModel):
     product_id: UUID
-    product_price_id: UUID
     color_id: Optional[UUID]
     size: Optional[str]
     category_id: Optional[UUID]

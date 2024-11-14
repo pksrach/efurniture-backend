@@ -10,7 +10,6 @@ class OrderDetail(BaseModel):
 
     order_id = Column(UUID(as_uuid=True), ForeignKey("orders.id"))
     product_id = Column(UUID(as_uuid=True), ForeignKey("products.id"))
-    product_price_id = Column(UUID(as_uuid=True), ForeignKey("product_prices.id"))
     category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id"))
     brand_id = Column(UUID(as_uuid=True), ForeignKey("brands.id"))
     color_id = Column(UUID(as_uuid=True), ForeignKey("colors.id"))
@@ -20,7 +19,6 @@ class OrderDetail(BaseModel):
     total = Column(Float)
 
     order = relationship("Order", back_populates="order_details")
-    product_price = relationship("ProductPrice", back_populates="order_details")
     product = relationship("Product", back_populates="order_details")
     category = relationship("Category", back_populates="order_details")
     brand = relationship("Brand", back_populates="order_details")

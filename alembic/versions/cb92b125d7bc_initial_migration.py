@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 16278713d25d
+Revision ID: cb92b125d7bc
 Revises: 
-Create Date: 2024-11-13 01:01:09.149793
+Create Date: 2024-11-14 21:24:52.927074
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '16278713d25d'
+revision: str = 'cb92b125d7bc'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -266,7 +266,6 @@ def upgrade() -> None:
     op.create_table('order_details',
     sa.Column('order_id', sa.UUID(), nullable=True),
     sa.Column('product_id', sa.UUID(), nullable=True),
-    sa.Column('product_price_id', sa.UUID(), nullable=True),
     sa.Column('category_id', sa.UUID(), nullable=True),
     sa.Column('brand_id', sa.UUID(), nullable=True),
     sa.Column('color_id', sa.UUID(), nullable=True),
@@ -285,7 +284,6 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['color_id'], ['colors.id'], ),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
-    sa.ForeignKeyConstraint(['product_price_id'], ['product_prices.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

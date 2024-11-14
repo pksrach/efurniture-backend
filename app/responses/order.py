@@ -70,36 +70,3 @@ class OrderListResponse(BaseResponse):
             data=[OrderDataResponse.from_entity(order) for order in orders],
             message="Orders fetched successfully"
         )
-
-
-class OrderDetailDataResponse(BaseResponse):
-    data: OrderDataResponse | None
-
-    @classmethod
-    def from_entity(cls, order: 'Order') -> 'OrderDetailDataResponse':
-        return cls(
-            data=OrderDataResponse.from_entity(order),
-            message="Order detail fetched successfully"
-        )
-
-
-class OrderDetailResponse(BaseResponse):
-    data: OrderDataResponse | None
-
-    @classmethod
-    def from_entity(cls, order: 'Order') -> 'OrderDetailResponse':
-        return cls(
-            data=OrderDataResponse.from_entity(order),
-            message="Order detail fetched successfully"
-        )
-
-
-class OrderDetailListResponse(BaseResponse):
-    data: list[OrderDataResponse]
-
-    @classmethod
-    def from_entities(cls, orders: list['Order']) -> 'OrderDetailListResponse':
-        return cls(
-            data=[OrderDataResponse.from_entity(order) for order in orders],
-            message="Order details fetched successfully"
-        )

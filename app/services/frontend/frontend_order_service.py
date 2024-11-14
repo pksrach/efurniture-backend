@@ -58,7 +58,6 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
             new_order_detail = OrderDetail(
                 order_id=new_order.id,
                 product_id=detail.product_id,
-                product_price_id=detail.product_price_id,
                 category_id=detail.category_id,
                 brand_id=detail.brand_id,
                 color_id=detail.color_id,
