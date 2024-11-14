@@ -19,6 +19,7 @@ def custom_openapi(app: FastAPI):
         {"name": "Backend Category API", "description": "Endpoints for managing categories in the backend."},
         {"name": "Backend Brand API", "description": "Endpoints for managing brands in the backend."},
         {"name": "Backend Product API", "description": "Endpoints for managing product details in the backend."},
+        {"name": "Backend Order API", "description": "Endpoints for managing order details in the backend."},
         {"name": "Backend User API", "description": "Endpoints for managing user accounts and roles in the backend."},
         {"name": "Backend Customer API", "description": "Endpoints for managing customer information in the backend."},
         {"name": "Backend Payment Method API", "description": "Endpoints for managing payment method information in the backend."},

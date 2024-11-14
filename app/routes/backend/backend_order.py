@@ -1,0 +1,20 @@
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.config.database import get_session
+from app.config.security import get_backend_user
+from app.responses.paginated_response import PaginationParam
+from app.services import order
+
+order_router = APIRouter(
+    prefix="/orders",
+    tags=["Backend Order API"],
+    responses={404: {"description": "Not found"}},
+    dependencies=[Depends(get_backend_user)]
+)
+
+
+@order_router.get("", status_code=200)
+async def get_orders(session: AsyncSession = Depends(get_session),
+                     pagination: PaginationParam = Depends(PaginationParam)):
+    return await order.get_orders(session, pagination)
