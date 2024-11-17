@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.config.security import get_backend_user
+from app.models.customer import Customer
 from app.models.order import Order
 from app.models.order_detail import OrderDetail
 from app.models.order_history import OrderHistory
@@ -15,7 +16,9 @@ from app.responses.order import OrderDataResponse, OrderResponse
 from app.responses.order_detail import OrderDetailResponse, OrderDetailListResponse, OrderDetailDataResponse
 from app.responses.order_history import OrderListHistoryResponse
 from app.responses.paginated_response import PaginationParam
+from app.schemas.notification import NotificationRequest
 from app.services.base_service import fetch_paginated_data
+from app.services.notification import NotificationService
 from app.services.order_history import create_order_history
 
 logger = logging.getLogger(__name__)
@@ -177,6 +180,9 @@ async def process_order(
 
         await session.commit()
 
+        # Push notification to customer
+        await notify_customer(session, order, current_user, order_status)
+
         return {
             "data": order.id,
             "message": f"Order has been {order_status}"
@@ -212,3 +218,37 @@ async def get_order_histories(order_id: str, session: AsyncSession):
             "message": "An error occurred while fetching order histories.",
             "error": str(e)
         }
+
+
+async def notify_customer(session, order, current_user, order_status):
+    # Fetch user based on customer id
+    stmt = (
+        select(Customer).options(
+            selectinload(Customer.user)
+        ).where(Customer.id == order.customer_id)
+    )
+    result = await session.execute(stmt)
+    customer = result.scalar()
+    if not customer:
+        return {
+            "message": "Customer not found!",
+            "error": "Customer not found"
+        }
+
+    # Get user id from customer
+    user_id_from_customer = customer.user_id
+
+    # Create notification
+    notification_service = NotificationService(session)
+    await notification_service.create_notification(
+        from_user_id=current_user.id,
+        request=NotificationRequest(
+            description=f"Your order has been {order_status.capitalize()}",
+            type="order",
+            target="customer:{}".format(user_id_from_customer),
+        )
+    )
+    return {
+        "message": "Notification sent successfully",
+        "data": True
+    }

@@ -8,9 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.customer import Customer
 from app.models.order import Order
 from app.models.order_detail import OrderDetail
+from app.schemas.notification import NotificationRequest
 from app.schemas.order import OrderRequest
 from app.services.frontend import frontend_cart_service
 from app.services.location import get_location
+from app.services.notification import NotificationService
 from app.services.order_history import create_order_history
 
 logger = logging.getLogger(__name__)
@@ -79,6 +81,27 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
 
         # Clear cart
         await frontend_cart_service.remove_all_carts(user, session)
+
+        # Add notification
+        notification_service = NotificationService(session)
+
+        # Fetch customer base on user id
+        stmt = (
+            select(Customer)
+            .where(Customer.user_id == user.id)
+        )
+        result = await session.execute(stmt)
+        customer = result.scalar()
+        phone = f"({customer.phone_number})" if customer and customer.phone_number else ""
+
+        await notification_service.create_notification(
+            from_user_id=user.id,
+            request=NotificationRequest(
+                description=f"New order {new_order.id} from {customer.name}{phone}",
+                type="order",
+                target=f"admin"
+            )
+        )
 
         logger.info("Order created successfully")
         return new_order
