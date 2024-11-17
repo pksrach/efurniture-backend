@@ -11,6 +11,7 @@ from app.responses.key_value_response import KeyValueResponse
 class OrderDataResponse(BaseModel):
     id: UUID | str
     order_date: date
+    order_number: str | None
     customer: KeyValueResponse
     location: KeyValueResponse
     location_price: float
@@ -26,6 +27,7 @@ class OrderDataResponse(BaseModel):
         return cls(
             id=order.id,
             order_date=order.order_date,
+            order_number=order.order_number,
             customer=KeyValueResponse(
                 key=str(order.customer_id),
                 value=order.customer.name if order.customer else None

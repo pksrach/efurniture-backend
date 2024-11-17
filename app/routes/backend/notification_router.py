@@ -24,7 +24,7 @@ async def get_notifications_unseen(
 
 
 @notification_router.get("/seen", status_code=200)
-async def get_notifications_unseen(
+async def get_notifications_seen(
         user=Depends(get_current_user),
         session: AsyncSession = Depends(get_session),
         pagination: PaginationParam = Depends(PaginationParam)

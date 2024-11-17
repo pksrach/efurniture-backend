@@ -97,7 +97,7 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
         await notification_service.create_notification(
             from_user_id=user.id,
             request=NotificationRequest(
-                description=f"New order {new_order.id} from {customer.name}{phone}",
+                description=f"New order {new_order.order_number} from {customer.name}{phone}",
                 type="order",
                 target=f"admin"
             )
