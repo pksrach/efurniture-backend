@@ -31,21 +31,30 @@ def create_application():
     return application
 
 
-origins = [
-    "http://localhost:3000",
-]
+class MainApp:
+    def __init__(self):
+        self.app = create_application()
+        self.configure_cors()
+        self.add_routes()
 
-app = create_application()
+    def configure_cors(self):
+        origins = [
+            "http://localhost:3000",
+        ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # Allows requests from these origins
-    allow_credentials=True,  # Allows cookies to be sent in cross-origin requests
-    allow_methods=["*"],  # Allows all HTTP methods
-    allow_headers=["*"],  # Allows all headers to be sent in requests
-)
+        self.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=origins,  # Allows requests from these origins
+            allow_credentials=True,  # Allows cookies to be sent in cross-origin requests
+            allow_methods=["*"],  # Allows all HTTP methods
+            allow_headers=["*"],  # Allows all headers to be sent in requests
+        )
+
+    def add_routes(self):
+        @self.app.get("/", include_in_schema=False)
+        async def root():
+            return {"message": "ok"}
 
 
-@app.get("/", include_in_schema=False)
-async def root():
-    return {"message": "ok"}
+main_app = MainApp()
+app = main_app.app
