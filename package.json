@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "uvicorn app.main:app --host 0.0.0.0 --port 8000",
-    "build": "sh create_env.sh && ./run.sh"
+    "build": "pip install -r requirements.txt && sh create_env.sh && ./run.sh"
   },
   "dependencies": {
     "fastapi": "^0.68.0",
