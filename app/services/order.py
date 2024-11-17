@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 from fastapi import Depends
 from sqlalchemy import select
@@ -24,7 +25,7 @@ from app.services.order_history import create_order_history
 logger = logging.getLogger(__name__)
 
 
-async def get_orders(session: AsyncSession, pagination: PaginationParam):
+async def get_orders(session: AsyncSession, pagination: PaginationParam, current_user=None):
     try:
         stmt = select(Order).options(
             selectinload(Order.customer),
@@ -32,6 +33,9 @@ async def get_orders(session: AsyncSession, pagination: PaginationParam):
             selectinload(Order.payment_method),
             selectinload(Order.staff)
         ).order_by(Order.created_at.desc())
+
+        if current_user is not None:
+            stmt = stmt.where(Order.created_by == current_user.id)
 
         return await fetch_paginated_data(
             session=session,
@@ -51,14 +55,24 @@ async def get_orders(session: AsyncSession, pagination: PaginationParam):
         }
 
 
-async def get_order(order_id, session: AsyncSession):
+async def get_order(order_id_or_number, session: AsyncSession, current_user=None):
     try:
         stmt = select(Order).options(
             selectinload(Order.customer),
             selectinload(Order.location),
             selectinload(Order.payment_method),
             selectinload(Order.staff)
-        ).where(Order.id == order_id)
+        )
+
+        try:
+            order_id = UUID(order_id_or_number)
+            stmt = stmt.where(Order.id == order_id)
+        except ValueError:
+            order_number = order_id_or_number
+            stmt = stmt.where(Order.order_number == order_number)
+
+        if current_user is not None:
+            stmt = stmt.where(Order.created_by == current_user.id)
 
         result = await session.execute(stmt)
         order = result.scalars().first()
@@ -81,14 +95,26 @@ async def get_order(order_id, session: AsyncSession):
         }
 
 
-async def get_order_details(order_id, session: AsyncSession):
+async def get_order_details(order_id, session: AsyncSession, current_user=None):
     try:
         stmt = select(OrderDetail).options(
             selectinload(OrderDetail.product),
             selectinload(OrderDetail.category),
             selectinload(OrderDetail.brand),
             selectinload(OrderDetail.color),
-        ).where(OrderDetail.order_id == order_id)
+        )
+
+        try:
+            order_id = UUID(order_id)
+            stmt = stmt.where(OrderDetail.order_id == order_id)
+        except ValueError:
+            return OrderDetailResponse(
+                data=None,
+                message="Invalid order id!"
+            )
+
+        if current_user is not None:
+            stmt = stmt.join(Order).where(Order.created_by == current_user.id)
 
         result = await session.execute(stmt)
         order_details = result.scalars().all()
@@ -196,11 +222,20 @@ async def process_order(
         }
 
 
-async def get_order_histories(order_id: str, session: AsyncSession):
+async def get_order_histories(order_id_or_number: str, session: AsyncSession, current_user=None):
     try:
-        stmt = select(OrderHistory).options(
+        stmt = select(OrderHistory).join(Order).options(
             selectinload(OrderHistory.order)
-        ).where(OrderHistory.order_id == order_id).order_by(OrderHistory.created_at.asc())
+        ).order_by(OrderHistory.created_at.asc())
+
+        try:
+            order_id = UUID(order_id_or_number)
+            stmt = stmt.where(OrderHistory.order_id == order_id)
+        except ValueError:
+            stmt = stmt.where(Order.order_number == order_id_or_number)
+
+        if current_user:
+            stmt = stmt.where(Order.created_by == current_user.id)
 
         result = await session.execute(stmt)
         order_histories = list(result.scalars().all())
@@ -243,7 +278,7 @@ async def notify_customer(session, order, current_user, order_status):
     await notification_service.create_notification(
         from_user_id=current_user.id,
         request=NotificationRequest(
-            description=f"Your order has been {order_status.capitalize()}",
+            description=f"Your order {order.order_number} has been {order_status.capitalize()}",
             type="order",
             target="customer:{}".format(user_id_from_customer),
         )

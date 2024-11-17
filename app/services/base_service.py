@@ -41,6 +41,8 @@ async def fetch_paginated_data(
     # Create the base query if stmt is not provided
     if stmt is None:
         stmt = select(entity)
+    else:
+        stmt = stmt
 
     # Apply search filter if provided
     if pagination.search:
@@ -73,7 +75,7 @@ async def fetch_paginated_data(
     if pagination.is_page:
         # Calculate pagination details
         offset = (pagination.page - 1) * pagination.limit
-        total_items_query = await session.execute(select(func.count(entity.id)))
+        total_items_query = await session.execute(select(func.count()).select_from(stmt.subquery()))
         total_items = total_items_query.scalar_one()
 
         # Fetch paginated results

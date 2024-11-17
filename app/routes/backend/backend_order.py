@@ -21,40 +21,40 @@ async def get_orders(session: AsyncSession = Depends(get_session),
     return await order.get_orders(session, pagination)
 
 
-@order_router.get("/{order_id}", status_code=200)
-async def get_order(order_id: str, session: AsyncSession = Depends(get_session)):
-    return await order.get_order(order_id, session)
+@order_router.get("/{order_id_or_number}", status_code=200)
+async def get_order(order_id_or_number: str, session: AsyncSession = Depends(get_session)):
+    return await order.get_order(order_id_or_number.strip(), session)
 
 
 @order_router.get("/details/{order_id}", status_code=200)
 async def get_order_details(order_id: str, session: AsyncSession = Depends(get_session)):
-    return await order.get_order_details(order_id, session)
+    return await order.get_order_details(order_id.strip(), session)
 
 
 @order_router.put("/accept/{order_id}", status_code=200)
 async def accept_order(order_id: str, session: AsyncSession = Depends(get_session),
                        current_user: User = Depends(get_backend_user)):
-    return await order.process_order(order_id, "accepted", session, current_user)
+    return await order.process_order(order_id.strip(), "accepted", session, current_user)
 
 
 @order_router.put("/delivery/{order_id}", status_code=200)
 async def delivery_order(order_id: str, session: AsyncSession = Depends(get_session),
                          current_user: User = Depends(get_backend_user)):
-    return await order.process_order(order_id, "delivered", session, current_user)
+    return await order.process_order(order_id.strip(), "delivered", session, current_user)
 
 
 @order_router.put("/done/{order_id}", status_code=200)
 async def done_order(order_id: str, session: AsyncSession = Depends(get_session),
                      current_user: User = Depends(get_backend_user)):
-    return await order.process_order(order_id, "done", session, current_user)
+    return await order.process_order(order_id.strip(), "done", session, current_user)
 
 
 @order_router.delete("/cancel/{order_id}", status_code=200)
 async def cancel_order(order_id: str, session: AsyncSession = Depends(get_session),
                        current_user: User = Depends(get_backend_user)):
-    return await order.process_order(order_id, "canceled", session, current_user)
+    return await order.process_order(order_id.strip(), "canceled", session, current_user)
 
 
-@order_router.get("/histories/{order_id}", status_code=200)
-async def get_orders(order_id, session: AsyncSession = Depends(get_session)):
-    return await order.get_order_histories(order_id, session)
+@order_router.get("/histories/{order_id_or_number}", status_code=200)
+async def get_orders(order_id_or_number, session: AsyncSession = Depends(get_session)):
+    return await order.get_order_histories(order_id_or_number.strip(), session)
