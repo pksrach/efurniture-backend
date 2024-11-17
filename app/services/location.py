@@ -14,14 +14,14 @@ from app.services.base_service import fetch_paginated_data
 logger = logging.getLogger(__name__)
 
 
-async def _get_location_by_id(id: str, session: AsyncSession) -> Optional[Location]:
-    stmt = select(Location).options(joinedload(Location.parent)).where(Location.id == id)
+async def _get_location_by_id(location_id: str, session: AsyncSession) -> Optional[Location]:
+    stmt = select(Location).options(joinedload(Location.parent)).where(Location.id == location_id)
     result = await session.execute(stmt)
     return result.unique().scalar_one()
 
 
 async def get_locations(session: AsyncSession, pagination: PaginationParam):
-    stmt = select(Location).options(joinedload(Location.parent)).order_by(Location.created_at)
+    stmt = select(Location).options(joinedload(Location.children)).order_by(Location.created_at)
 
     return await fetch_paginated_data(
         session=session,
@@ -34,11 +34,11 @@ async def get_locations(session: AsyncSession, pagination: PaginationParam):
     )
 
 
-async def get_location(id: str, session: AsyncSession) -> LocationResponse:
-    location = await _get_location_by_id(id, session)
+async def get_location(location_id: str, session: AsyncSession) -> LocationResponse:
+    location = await _get_location_by_id(location_id, session)
 
     if location is None:
-        logger.warning(f"Location with ID {id} not found.")
+        logger.warning(f"Location with ID {location_id} not found.")
         return LocationResponse(
             data=None,
             message="Location not found"
@@ -73,12 +73,12 @@ async def create_location(req: LocationRequest, session: AsyncSession) -> Locati
         )
 
 
-async def update_location(id: str, req: LocationRequest, session: AsyncSession) -> LocationResponse:
+async def update_location(location_id: str, req: LocationRequest, session: AsyncSession) -> LocationResponse:
     """Update a Location by ID with the provided data."""
-    location = await _get_location_by_id(id, session)
+    location = await _get_location_by_id(location_id, session)
 
     if location is None:
-        logger.warning(f"Location with ID {id} not found.")
+        logger.warning(f"Location with ID {location_id} not found.")
         return LocationResponse(
             data=None,
             message="Location not found"
@@ -91,22 +91,22 @@ async def update_location(id: str, req: LocationRequest, session: AsyncSession) 
     try:
         await session.commit()
         await session.refresh(location)
-        logger.info(f"Location with ID {id} updated successfully.")
+        logger.info(f"Location with ID {location_id} updated successfully.")
         return LocationResponse(
             data=LocationDataResponse.from_entity(location),
             message="Location updated successfully"
         )
     except IntegrityError as e:
         await session.rollback()
-        logger.error(f"Integrity error during update of Location {id}: {str(e)}")
+        logger.error(f"Integrity error during update of Location {location_id}: {str(e)}")
         return LocationResponse(
             data=None,
             message="Failed to update Location due to database integrity error."
         )
 
 
-async def delete_location(id: str, session: AsyncSession) -> LocationResponse:
-    stmt = select(Location).where(Location.id == id)
+async def delete_location(location_id: str, session: AsyncSession) -> LocationResponse:
+    stmt = select(Location).where(Location.id == location_id)
     result = await session.execute(stmt)
     location = result.scalar()
 

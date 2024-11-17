@@ -13,3 +13,4 @@ class Category(BaseModel):
 
     # Reference Product model using a string to avoid circular imports
     products = relationship('Product', back_populates='category')
+    order_details = relationship('OrderDetail', back_populates='category')

@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     # App
     APP_NAME: str = os.environ.get("APP_NAME", "FastAPI")
     DEBUG: bool = bool(os.environ.get("DEBUG", False))
+    TIMEZONE: str = os.environ.get("TIMEZONE", "Asia/Phnom_Penh")
 
     # Postgresql Database Config
     PG_PORT: str = os.environ.get("POSTGRES_PORT", "5432")

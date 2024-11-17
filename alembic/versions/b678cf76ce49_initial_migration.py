@@ -1,8 +1,8 @@
 """Initial migration
 
-Revision ID: 7025bcdd7f87
+Revision ID: b678cf76ce49
 Revises: 
-Create Date: 2024-09-20 09:10:08.204117
+Create Date: 2024-11-17 16:58:46.151693
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '7025bcdd7f87'
+revision: str = 'b678cf76ce49'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -139,17 +139,16 @@ def upgrade() -> None:
     op.create_table('notifications',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('from_user_id', sa.UUID(), nullable=True),
-    sa.Column('to_user_id', sa.UUID(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
-    sa.Column('date', sa.Date(), nullable=True),
+    sa.Column('date', sa.DateTime(), nullable=True),
     sa.Column('type', sa.String(), nullable=True),
+    sa.Column('target', sa.String(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('created_by', sa.UUID(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('updated_by', sa.UUID(), nullable=True),
     sa.Column('deleted_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['from_user_id'], ['users.id'], ),
-    sa.ForeignKeyConstraint(['to_user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('products',
@@ -197,13 +196,18 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_user_tokens_access_key'), 'user_tokens', ['access_key'], unique=False)
     op.create_index(op.f('ix_user_tokens_refresh_key'), 'user_tokens', ['refresh_key'], unique=False)
+    op.create_table('notification_seen_users',
+    sa.Column('notification_id', sa.UUID(), nullable=False),
+    sa.Column('user_id', sa.UUID(), nullable=False),
+    sa.ForeignKeyConstraint(['notification_id'], ['notifications.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('notification_id', 'user_id')
+    )
     op.create_table('orders',
     sa.Column('order_date', sa.Date(), nullable=False),
     sa.Column('customer_id', sa.UUID(), nullable=True),
     sa.Column('location_id', sa.UUID(), nullable=True),
     sa.Column('location_price', sa.Float(), nullable=True),
-    sa.Column('total', sa.Float(), nullable=True),
-    sa.Column('discount', sa.Float(), nullable=True),
     sa.Column('amount', sa.Float(), nullable=True),
     sa.Column('payment_method_id', sa.UUID(), nullable=True),
     sa.Column('payment_attachment', sa.String(), nullable=True),
@@ -251,14 +255,46 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('carts',
+    sa.Column('user_id', sa.UUID(), nullable=True),
+    sa.Column('product_price_id', sa.UUID(), nullable=True),
+    sa.Column('qty', sa.Integer(), nullable=True),
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_by', sa.UUID(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_by', sa.UUID(), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['product_price_id'], ['product_prices.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     op.create_table('order_details',
     sa.Column('order_id', sa.UUID(), nullable=True),
-    sa.Column('product_price_id', sa.UUID(), nullable=True),
+    sa.Column('product_id', sa.UUID(), nullable=True),
+    sa.Column('category_id', sa.UUID(), nullable=True),
+    sa.Column('brand_id', sa.UUID(), nullable=True),
+    sa.Column('color_id', sa.UUID(), nullable=True),
+    sa.Column('size', sa.String(), nullable=True),
     sa.Column('price', sa.Float(), nullable=True),
     sa.Column('qty', sa.Integer(), nullable=True),
     sa.Column('total', sa.Float(), nullable=True),
-    sa.Column('discount', sa.Float(), nullable=True),
-    sa.Column('amount', sa.Float(), nullable=True),
+    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
+    sa.Column('created_by', sa.UUID(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_by', sa.UUID(), nullable=True),
+    sa.Column('deleted_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['brand_id'], ['brands.id'], ),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.id'], ),
+    sa.ForeignKeyConstraint(['color_id'], ['colors.id'], ),
+    sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('order_histories',
+    sa.Column('order_id', sa.UUID(), nullable=True),
+    sa.Column('order_status', sa.String(), nullable=True),
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=False),
     sa.Column('created_by', sa.UUID(), nullable=True),
@@ -266,7 +302,6 @@ def upgrade() -> None:
     sa.Column('updated_by', sa.UUID(), nullable=True),
     sa.Column('deleted_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
-    sa.ForeignKeyConstraint(['product_price_id'], ['product_prices.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
@@ -274,10 +309,13 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('order_histories')
     op.drop_table('order_details')
+    op.drop_table('carts')
     op.drop_table('product_rates')
     op.drop_table('product_prices')
     op.drop_table('orders')
+    op.drop_table('notification_seen_users')
     op.drop_index(op.f('ix_user_tokens_refresh_key'), table_name='user_tokens')
     op.drop_index(op.f('ix_user_tokens_access_key'), table_name='user_tokens')
     op.drop_table('user_tokens')

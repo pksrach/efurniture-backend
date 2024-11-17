@@ -13,3 +13,4 @@ class Color(BaseModel):
     highlight = Column(String)
 
     product_prices = relationship("ProductPrice", back_populates="color")
+    order_details = relationship('OrderDetail', back_populates='color')

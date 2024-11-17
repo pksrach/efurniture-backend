@@ -141,8 +141,6 @@ To set up the **efurniture** platform locally:
   
 - **Run the database migrations**:
   ```bash
-  alembic upgrade head
-  or
   alembic upgrade heads
   ```
 

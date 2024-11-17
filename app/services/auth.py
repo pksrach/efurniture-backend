@@ -11,11 +11,10 @@ from starlette.responses import JSONResponse
 from app.config.custom_exceptions import CustomHTTPException
 from app.config.security import generate_token, verify_password, get_token_payload, hash_password
 from app.config.settings import get_settings
-from app.constants.roles import Roles
 from app.models.user import User
 from app.models.user_token import UserToken
 from app.responses.auth import TokenResponse, TokenData
-from app.schemas.auth import LoginRequest, VerifyPasswordRequest, ResetNewPasswordRequest
+from app.schemas.auth import LoginRequest, VerifyPasswordRequest
 
 settings = get_settings()
 
@@ -161,7 +160,7 @@ async def auth_verify_password(req: VerifyPasswordRequest, session: AsyncSession
         raise CustomHTTPException(status_code=400, message="Invalid code.")
 
     expiry = 5  # in minutes
-    access_token = generate_token(user_token, timedelta(minutes=expiry))
+    access_token = generate_token(user_token.user, timedelta(minutes=expiry))
 
     return {
         "message": "Code verified successfully.",

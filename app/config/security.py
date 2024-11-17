@@ -1,6 +1,4 @@
-import base64
 import logging
-import uuid
 from datetime import datetime, timedelta
 
 import jwt
@@ -56,14 +54,6 @@ def is_password_strong_enough(password: str) -> bool:
 def is_password_long_enough(password: str) -> bool:
     """Check if the password has a length of at least 8 characters."""
     return len(password) >= 8
-
-
-def str_encode(string: str) -> str:
-    return base64.b85encode(string.encode('ascii')).decode('ascii')
-
-
-def str_decode(string: str) -> str:
-    return base64.b85decode(string.encode('ascii')).decode('ascii')
 
 
 def get_token_payload(token: str, secret: str, algo: str):

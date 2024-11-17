@@ -18,9 +18,9 @@ async def get_locations(session: AsyncSession = Depends(get_session),
     return await location.get_locations(session, pagination)
 
 
-@location_router.get("/{id}", status_code=200)
-async def get_location(id: str, session: AsyncSession = Depends(get_session)):
-    return await location.get_location(id, session)
+@location_router.get("/{location_id}", status_code=200)
+async def get_location(location_id: str, session: AsyncSession = Depends(get_session)):
+    return await location.get_location(location_id, session)
 
 
 @location_router.post("", status_code=200)
@@ -28,11 +28,11 @@ async def create_location(req: location.LocationRequest, session: AsyncSession =
     return await location.create_location(req, session)
 
 
-@location_router.put("/{id}", status_code=200)
-async def update_location(id: str, req: location.LocationRequest, session: AsyncSession = Depends(get_session)):
-    return await location.update_location(id, req, session)
+@location_router.put("/{location_id}", status_code=200)
+async def update_location(location_id: str, req: location.LocationRequest, session: AsyncSession = Depends(get_session)):
+    return await location.update_location(location_id, req, session)
 
 
-@location_router.delete("/{id}", status_code=200)
-async def delete_location(id: str, session: AsyncSession = Depends(get_session)):
-    return await location.delete_location(id, session)
+@location_router.delete("/{location_id}", status_code=200)
+async def delete_location(location_id: str, session: AsyncSession = Depends(get_session)):
+    return await location.delete_location(location_id, session)

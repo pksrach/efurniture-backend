@@ -9,7 +9,7 @@ from app.config.swagger import custom_openapi
 from app.routes import auth
 from app.routes.backend.base_backend import backend_router
 from app.routes.frontend.base_frontend import frontend_router
-from app.routes.seeding import seed_user
+from app.routes.seeding.seed_data import seed_router
 
 
 def create_application():
@@ -23,7 +23,7 @@ def create_application():
     # Serve the 'uploads' directory as static files
     application.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
-    application.include_router(seed_user.seed_user_router)
+    application.include_router(seed_router)
     application.include_router(frontend_router)
     application.include_router(auth.guest_router)
     application.include_router(backend_router)

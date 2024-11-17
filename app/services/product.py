@@ -39,13 +39,13 @@ async def get_products(session: AsyncSession, pagination: PaginationParam):
     )
 
 
-async def get_product(id: str, session: AsyncSession) -> ProductResponse:
+async def get_product(product_id: str, session: AsyncSession) -> ProductResponse:
     stmt = (
         select(Product).options(
             selectinload(Product.category),
             selectinload(Product.brand),
             selectinload(Product.product_prices).selectinload(ProductPrice.color)  # Load the color for product prices
-        ).where(Product.id == id)
+        ).where(Product.id == product_id)
     )
     result = await session.execute(stmt)
     product = result.scalars().first()
@@ -105,13 +105,13 @@ async def create_product(req: ProductRequest, session: AsyncSession) -> ProductR
         raise e
 
 
-async def update_product(id: str, req: ProductRequest, session: AsyncSession) -> ProductResponse:
+async def update_product(product_id: str, req: ProductRequest, session: AsyncSession) -> ProductResponse:
     try:
         stmt = select(Product).options(
             selectinload(Product.category),
             selectinload(Product.brand),
             selectinload(Product.product_prices).selectinload(ProductPrice.color)
-        ).where(Product.id == id)
+        ).where(Product.id == product_id)
         result = await session.execute(stmt)
         product = result.scalar()
 
@@ -205,8 +205,8 @@ async def update_product(id: str, req: ProductRequest, session: AsyncSession) ->
         )
 
 
-async def delete_product(id: str, session: AsyncSession):
-    stmt = select(Product).where(Product.id == id)
+async def delete_product(product_id: str, session: AsyncSession):
+    stmt = select(Product).where(Product.id == product_id)
     result = await session.execute(stmt)
     product = result.scalar()
 

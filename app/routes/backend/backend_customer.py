@@ -18,11 +18,11 @@ async def get_customers(session: AsyncSession = Depends(get_session),
     return await customer.get_customers(session, pagination)
 
 
-@customer_router.get("/{id}", status_code=200)
-async def get_customer(id: str, session: AsyncSession = Depends(get_session)):
-    return await customer.get_customer(id, session)
+@customer_router.get("/{customer_id}", status_code=200)
+async def get_customer(customer_id: str, session: AsyncSession = Depends(get_session)):
+    return await customer.get_customer(customer_id, session)
 
 
-@customer_router.put("/reset_password/{id}", status_code=200)
-async def reset_password(id: str, password: str, session: AsyncSession = Depends(get_session)):
-    return await customer.reset_password(id, password, session)
+@customer_router.put("/reset_password/{customer_id}", status_code=200)
+async def reset_password(customer_id: str, password: str, session: AsyncSession = Depends(get_session)):
+    return await customer.reset_password(customer_id, password, session)

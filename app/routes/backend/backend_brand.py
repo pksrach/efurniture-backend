@@ -18,9 +18,9 @@ async def get_brands(session: AsyncSession = Depends(get_session),
     return await brand.get_brands(session, pagination)
 
 
-@brand_router.get("/{id}", status_code=200)
-async def get_brand(id: str, session: AsyncSession = Depends(get_session)):
-    return await brand.get_brand(id, session)
+@brand_router.get("/{brand_id}", status_code=200)
+async def get_brand(brand_id: str, session: AsyncSession = Depends(get_session)):
+    return await brand.get_brand(brand_id, session)
 
 
 @brand_router.post("", status_code=201)
@@ -28,11 +28,11 @@ async def create_brand(req: brand.BrandRequest, session: AsyncSession = Depends(
     return await brand.create_brand(req, session)
 
 
-@brand_router.put("/{id}", status_code=200)
-async def update_brand(id: str, req: brand.BrandRequest, session: AsyncSession = Depends(get_session)):
-    return await brand.update_brand(id, req, session)
+@brand_router.put("/{brand_id}", status_code=200)
+async def update_brand(brand_id: str, req: brand.BrandRequest, session: AsyncSession = Depends(get_session)):
+    return await brand.update_brand(brand_id, req, session)
 
 
-@brand_router.delete("/{id}", status_code=200)
-async def delete_brand(id: str, session: AsyncSession = Depends(get_session)):
-    return await brand.delete_brand(id, session)
+@brand_router.delete("/{brand_id}", status_code=200)
+async def delete_brand(brand_id: str, session: AsyncSession = Depends(get_session)):
+    return await brand.delete_brand(brand_id, session)

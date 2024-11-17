@@ -18,5 +18,4 @@ class ProductPrice(BaseModel):
 
     color = relationship("Color", back_populates="product_prices")
     product = relationship("Product", back_populates="product_prices")
-    order_details = relationship("OrderDetail", back_populates="product_price")
     carts = relationship("Cart", back_populates="product_price")

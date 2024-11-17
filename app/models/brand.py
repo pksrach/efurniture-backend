@@ -13,3 +13,4 @@ class Brand(BaseModel):
 
     # Define the relationship to Product
     products = relationship("Product", back_populates="brand")
+    order_details = relationship("OrderDetail", back_populates="brand")

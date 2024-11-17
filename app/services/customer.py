@@ -11,17 +11,17 @@ from app.responses.paginated_response import PaginationParam
 from app.services.base_service import fetch_paginated_data
 
 
-async def reset_password(id: str, password: str, session: AsyncSession):
+async def reset_password(customer_id: str, password: str, session: AsyncSession):
     try:
         # Validate and convert the id to a UUID object
-        customer_id = uuid.UUID(id)
+        customer_uuid = uuid.UUID(customer_id)
     except ValueError:
         raise Exception("Invalid UUID format")
 
     stmt = (
         select(Customer)
         .options(joinedload(Customer.user))
-        .where(Customer.id == customer_id)
+        .where(Customer.id == customer_uuid)
     )
     result = await session.execute(stmt)
     customer = result.scalars().first()
@@ -40,11 +40,11 @@ async def reset_password(id: str, password: str, session: AsyncSession):
     }
 
 
-async def get_customer(id: str, session: AsyncSession) -> CustomerResponse:
+async def get_customer(customer_id: str, session: AsyncSession) -> CustomerResponse:
     stmt = (
         select(Customer)
         .options(joinedload(Customer.user))
-        .where(Customer.id == id)
+        .where(Customer.id == customer_id)
     )
     result = await session.execute(stmt)
     customer = result.scalar()

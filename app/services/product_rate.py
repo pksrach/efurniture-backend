@@ -13,8 +13,8 @@ from app.services.base_service import fetch_paginated_data
 logger = logging.getLogger(__name__)
 
 
-async def _get_product_rate_by_id(id: str, session: AsyncSession) -> Optional[ProductRate]:
-    stmt = select(ProductRate).where(ProductRate.id == id)
+async def _get_product_rate_by_id(product_rate_id: str, session: AsyncSession) -> Optional[ProductRate]:
+    stmt = select(ProductRate).where(ProductRate.id == product_rate_id)
     result = await session.execute(stmt)
     return result.scalar_one_or_none()
 
@@ -29,11 +29,11 @@ async def get_product_rates(session: AsyncSession, pagination: PaginationParam):
     )
 
 
-async def get_product_rate(id: str, session: AsyncSession) -> ProductRateResponse:
-    product_rate = await _get_product_rate_by_id(id, session)
+async def get_product_rate(product_rate_id: str, session: AsyncSession) -> ProductRateResponse:
+    product_rate = await _get_product_rate_by_id(product_rate_id, session)
 
     if product_rate is None:
-        logger.warning(f"Product Rate with ID {id} not found.")
+        logger.warning(f"Product Rate with ID {product_rate_id} not found.")
         return ProductRateResponse(
             data=None,
             message="Product Rate not found"
@@ -68,12 +68,12 @@ async def create_product_rate(req: ProductRateRequest, session: AsyncSession) ->
         )
 
 
-async def update_product_rate(id: str, req: ProductRateRequest, session: AsyncSession) -> ProductRateResponse:
+async def update_product_rate(product_rate_id: str, req: ProductRateRequest, session: AsyncSession) -> ProductRateResponse:
     """Update a Product Rate by ID with the provided data."""
-    product_rate = await _get_product_rate_by_id(id, session)
+    product_rate = await _get_product_rate_by_id(product_rate_id, session)
 
     if product_rate is None:
-        logger.warning(f"Product Rate with ID {id} not found.")
+        logger.warning(f"Product Rate with ID {product_rate_id} not found.")
         return ProductRateResponse(
             data=None,
             message="Product Rate not found"
@@ -86,22 +86,22 @@ async def update_product_rate(id: str, req: ProductRateRequest, session: AsyncSe
     try:
         await session.commit()
         await session.refresh(product_rate)
-        logger.info(f"Product Rate with ID {id} updated successfully.")
+        logger.info(f"Product Rate with ID {product_rate_id} updated successfully.")
         return ProductRateResponse(
             data=ProductRateDataResponse.from_entity(product_rate),
             message="Product Rate updated successfully"
         )
     except IntegrityError as e:
         await session.rollback()
-        logger.error(f"Integrity error during update of Product Rate {id}: {str(e)}")
+        logger.error(f"Integrity error during update of Product Rate {product_rate_id}: {str(e)}")
         return ProductRateResponse(
             data=None,
             message="Failed to update Product Rate due to database integrity error."
         )
 
 
-async def delete_product_rate(id: str, session: AsyncSession) -> ProductRateResponse:
-    stmt = select(ProductRate).where(ProductRate.id == id)
+async def delete_product_rate(product_rate_id: str, session: AsyncSession) -> ProductRateResponse:
+    stmt = select(ProductRate).where(ProductRate.id == product_rate_id)
     result = await session.execute(stmt)
     product_rate = result.scalar()
 
