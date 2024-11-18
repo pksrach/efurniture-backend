@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     PG_USER: str = os.environ.get("POSTGRES_USER")
     PG_PASSWORD: str = os.environ.get("POSTGRES_PASSWORD")
     PG_DB: str = os.environ.get("POSTGRES_DATABASE")
-    DATABASE_URI: str = f"postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}"
+    DATABASE_URI: str = f"postgresql+asyncpg://{PG_USER}:{PG_PASSWORD}@{PG_HOST}:{PG_PORT}/{PG_DB}?statement_cache_size=0"
 
     # JWT Secret Key
     JWT_SECRET: str = os.environ.get("JWT_SECRET_KEY", "your_jwt_secret_key")
