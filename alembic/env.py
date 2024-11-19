@@ -1,7 +1,6 @@
 from logging.config import fileConfig
-
 from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 
 # Import All Models
@@ -93,7 +92,8 @@ async def run_migrations_online() -> None:
     """
     connectable = create_async_engine(
         config.get_main_option("sqlalchemy.url"),
-        poolclass=pool.NullPool
+        poolclass=pool.NullPool,
+        connect_args={"statement_cache_size": 0}
     )
 
     async with connectable.connect() as connection:
