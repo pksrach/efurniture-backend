@@ -1,18 +1,15 @@
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 from app.config.settings import get_settings
 
 settings = get_settings()
 
-# Add connect_args to disable statement caching
-engine = create_async_engine(
-    settings.DATABASE_URI,
-    echo=True,
-    connect_args={"statement_cache_size": 0}  # Disables prepared statement caching
-)
+# Create SQLAlchemy engine with asyncpg dialect
+engine = create_async_engine(settings.DATABASE_URI, echo=True)
 
+# Set up the sessionmaker for async sessions
 async_session_maker = sessionmaker(
     bind=engine,
     class_=AsyncSession,
