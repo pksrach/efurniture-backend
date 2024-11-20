@@ -1,16 +1,20 @@
-from datetime import date
+from datetime import datetime
 from uuid import UUID
 
+import pytz
 from pydantic import BaseModel
 
+from app.config.settings import get_settings
 from app.models.order import Order
 from app.responses.base import BaseResponse
 from app.responses.key_value_response import KeyValueResponse
 
 
+settings = get_settings()
+
 class OrderDataResponse(BaseModel):
     id: UUID | str
-    order_date: date
+    order_date: str
     order_number: str | None
     customer: KeyValueResponse
     location: KeyValueResponse
@@ -24,9 +28,19 @@ class OrderDataResponse(BaseModel):
 
     @classmethod
     def from_entity(cls, order: 'Order') -> 'OrderDataResponse':
+        env_timezone = settings.TIMEZONE
+        local_tz = pytz.timezone(env_timezone)
+
+        # Ensure created_at is timezone-aware
+        if order.order_date.tzinfo is None:
+            order.order_date = pytz.utc.localize(order.order_date)
+
+        # Convert to local timezone
+        local_dt = order.order_date.astimezone(local_tz)
+
         return cls(
             id=order.id,
-            order_date=order.order_date,
+            order_date=local_dt.strftime("%d-%m-%Y %I:%M %p"),
             order_number=order.order_number,
             customer=KeyValueResponse(
                 key=str(order.customer_id),

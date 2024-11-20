@@ -1,13 +1,14 @@
 import logging
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.customer import Customer
 from app.models.order import Order
 from app.models.order_detail import OrderDetail
+from app.responses.order import OrderResponse
 from app.schemas.notification import NotificationRequest
 from app.schemas.order import OrderRequest
 from app.services.frontend import frontend_cart_service
@@ -40,7 +41,7 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
 
         # Create the order
         new_order = Order(
-            order_date=datetime.now(),
+            order_date=func.now(),
             order_status='pending',
             amount=0,
             customer_id=customer_id,
@@ -104,7 +105,7 @@ async def create_order(req: OrderRequest, user, session: AsyncSession):
         )
 
         logger.info("Order created successfully")
-        return new_order
+        return OrderResponse.from_entity(new_order)
 
     except SQLAlchemyError as e:
         logger.error(f"Error creating order: {e}")
