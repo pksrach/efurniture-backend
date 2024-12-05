@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, Date, ForeignKey, String, Float, event
+from sqlalchemy import Column, DateTime, ForeignKey, String, Float, event
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.models.base import BaseModel
@@ -11,7 +11,7 @@ from app.models.order_detail import OrderDetail  # Ensure OrderDetail is importe
 
 class Order(BaseModel):
     __tablename__ = "orders"
-    order_date = Column(Date, nullable=False)
+    order_date = Column(DateTime, nullable=False)
     order_number = Column(String, unique=True, nullable=True)
     customer_id = Column(UUID(as_uuid=True), ForeignKey("customers.id"))
     location_id = Column(UUID(as_uuid=True), ForeignKey("locations.id"))
